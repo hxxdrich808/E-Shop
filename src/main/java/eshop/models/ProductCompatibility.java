@@ -36,7 +36,6 @@ public class ProductCompatibility {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "prod_id", referencedColumnName = "id", table = "Product")
+    @JoinColumn(name = "prod_id", referencedColumnName = "id")
     private Product product;
 }
-
