@@ -2,15 +2,6 @@
 <@t.template user>
     <h4>Магазины по всей России</h4>
     <div class="form-row">
-        <div class="form-group col-md-2">
-            <label for="searchCity">Город</label>
-            <select id="searchCity" class="form-control">
-                <option value="">Город не выбран</option>
-                <option value="Москва">Москва</option>
-                <option value="Красноярск">Красноярск</option>
-                <option value="Казань">Казань</option>
-            </select>
-        </div>
         <div class="form-group col-md-10">
             <label for="searchWord">Поиск по объявлениям</label>
             <input type="text" name="searchWord" <#if searchWord??>value="${searchWord}"</#if> class="form-control"

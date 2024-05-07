@@ -1,0 +1,6 @@
+package eshop.models.enums;
+
+public enum ProductType  {
+
+    CPU,MOTHERBOARD,CASE,GPU,COOLER,RAM,DRIVE,PSU,MOUSE,HEADSET,SMARTPHONE,KEYBOARD,MICROPHONE
+}

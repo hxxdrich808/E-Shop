@@ -1,6 +1,6 @@
 <#import "blocks/template.ftlh" as t>
 <@t.template user>
-    <h1>BUYSELL</h1><hr>
+    <h1>E-Shop</h1><hr>
     <h4>Регистрация</h4>
     <form action="/registration" method="post">
         Имя пользователя: <input type="text" name="name"><br><br>

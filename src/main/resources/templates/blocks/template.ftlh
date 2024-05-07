@@ -20,6 +20,9 @@
             <a href="/">
                 <span class="navbar-brand mb-0 h1">E-Shop</span>
             </a>
+            <div class="pc-builder">
+                <a href="/pcbuilder" class="btn btn-primary">Конструктор ПК</a>
+            </div>
             <#if user.email??>
                 <div class="dropdown text-end">
 

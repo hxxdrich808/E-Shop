@@ -28,7 +28,17 @@
                 Добавить новый товар
             </a>
             <div class="collapse mb-3" id="collapseExample" style="">
-                <form action="/product/create" method="post" enctype="multipart/form-data">
+                <form action="/Product/create" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <div>
+                            <label for="productType">Категория товара</label>
+                            <select class="form-control" id="productType" name="productType">
+                                <#list ProductType as type>
+                                    <option value="${type}">${type}</option>
+                                </#list>
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label for="productName">Название товара</label>
                         <input type="text" required class="form-control"
