@@ -4,7 +4,6 @@ import eshop.models.ProductCompatibility;
 import eshop.models.enums.ProductType;
 import eshop.models.Image;
 import eshop.models.Product;
-import eshop.models.ProductCompatibility;
 import eshop.models.User;
 import eshop.repositories.ProductCompatibilityRepository;
 import eshop.repositories.ProductRepository;
@@ -12,11 +11,13 @@ import eshop.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,20 +33,12 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    @Transactional
     public void saveProduct(ProductType productType, Product product, ProductCompatibility productCompatibility, MultipartFile file1, MultipartFile file2, MultipartFile file3) throws IOException {
         Image image1;
         Image image2;
         Image image3;
         product.setProductType(productType);
-        //возможно стоит вынести сохранение совместимости продукта в отдельный метод
-        switch (productType){
-            case CPU -> productCompatibilityRepository.save(productCompatibility);
-            case MOTHERBOARD -> productCompatibilityRepository.save(productCompatibility);
-            case CASE -> productCompatibilityRepository.save(productCompatibility);
-            case GPU -> productCompatibilityRepository.save(productCompatibility);
-            case RAM -> productCompatibilityRepository.save(productCompatibility);
-            case DRIVE -> productCompatibilityRepository.save(productCompatibility);
-        }
         if(file1.getSize() != 0){
             image1 = toImageEntity(file1);
             image1.setPreviewImage(true);
@@ -63,6 +56,12 @@ public class ProductService {
         Product productFromDB = productRepository.save(product);
         productFromDB.setPreviewImageId(productFromDB.getImages().get(0).getId());
         productRepository.save(product);
+        switch (productType){
+            case CPU,MOTHERBOARD,CASE,GPU,RAM,DRIVE ->{
+                productCompatibility.setProduct(product);
+                productCompatibilityRepository.save(productCompatibility);
+            }
+        }
     }
 
     public User getUserByPrincipal(Principal principal){

@@ -33,6 +33,7 @@
                         <div>
                             <label for="productType">Категория товара</label>
                             <select class="form-control" id="productType" name="productType">
+                                <option value="CHOOSE">Выберите категорию</option>
                                 <#list ProductType as type>
                                     <option value="${type}">${type}</option>
                                 </#list>
@@ -56,6 +57,32 @@
                     <div class="form-group">
                         <label for="description">Описание товара</label>
                         <textarea required class="form-control" id="description" name="description"></textarea>
+                    </div>
+                    <div id="compatibilityFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="chipset">Чипсет</label>
+                            <input type="text" class="form-control" id="chipset" name="chipset">
+                        </div>
+                        <div class="form-group">
+                            <label for="socket">Сокет</label>
+                            <input type="text" class="form-control" id="socket" name="socket">
+                        </div>
+                        <div class="form-group">
+                            <label for="ddr">DDR</label>
+                            <input type="text" class="form-control" id="ddr" name="ddr">
+                        </div>
+                        <div class="form-group">
+                            <label for="gddr">GDDR</label>
+                            <input type="text" class="form-control" id="gddr" name="gddr">
+                        </div>
+                        <div class="form-group">
+                            <label for="m2slot">M2 Слот</label>
+                            <input type="text" class="form-control" id="m2slot" name="m2slot">
+                        </div>
+                        <div class="form-group">
+                            <label for="format">Формат</label>
+                            <input type="text" class="form-control" id="format" name="format">
+                        </div>
                     </div>
                     <div class="form-group">
                         <div class="custom-file">
@@ -91,4 +118,27 @@
             </form>
         </div>
     </div>
+    <script>
+        function toggleCompatibilityFields() {
+            console.log('Функция toggleCompatibilityFields вызвана');
+            const compatibilityFields = document.getElementById('compatibilityFields');
+            const productType = document.getElementById('productType').value.trim().toUpperCase();
+            const compatibleTypes = ['CPU', 'MOTHERBOARD', 'CASE', 'GPU', 'RAM', 'DRIVE'];
+
+            console.log('Выбранный тип продукта:', productType);
+            if (compatibleTypes.includes(productType)) {
+                compatibilityFields.style.display = 'block';
+                console.log('Поля совместимости отображены');
+            } else {
+                compatibilityFields.style.display = 'none';
+                console.log('Поля совместимости скрыты');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const productTypeElement = document.getElementById('productType');
+            productTypeElement.addEventListener('change', toggleCompatibilityFields);
+            toggleCompatibilityFields(); // Проверка начального состояния
+        });
+    </script>
 </@t.template>

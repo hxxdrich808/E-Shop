@@ -14,6 +14,7 @@ public class ProductCompatibility {
 
     @Id
     @Column(name = "prod_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long prodId;
 
     @Column(name = "chipset")
@@ -38,4 +39,5 @@ public class ProductCompatibility {
     @MapsId
     @JoinColumn(name = "prod_id", referencedColumnName = "id")
     private Product product;
+
 }

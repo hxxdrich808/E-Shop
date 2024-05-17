@@ -3,7 +3,6 @@ package eshop.controllers;
 import eshop.models.ProductCompatibility;
 import eshop.models.enums.ProductType;
 import eshop.models.Product;
-//import eshop.models.ProductCompatibility;
 import eshop.servives.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -19,7 +18,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/")
-    public String products(@RequestParam(name = "title",required = false) String Title,Principal principal, Model model){
+    public String products(@RequestParam(name = "title",required = false) String Title ,Principal principal, Model model){
         model.addAttribute("Products",productService.listProducts(Title));
         model.addAttribute("ProductType", ProductType.class);
         model.addAttribute("user",productService.getUserByPrincipal(principal));
