@@ -1,5 +1,6 @@
 package eshop.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import eshop.models.enums.ProductType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class Product {
     private ProductType productType;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "product")
+    @JsonIgnore
     private List<Image> images = new ArrayList<>();
     private Long previewImageId;
     private LocalDateTime dateOfCreated;

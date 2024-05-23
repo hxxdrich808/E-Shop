@@ -1,63 +1,154 @@
 <#import "blocks/template.ftlh" as t>
 <@t.template user>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Конструктор ПК</title>
-</head>
-<body>
-<h1>Конструктор ПК</h1>
-<form action="/build" method="POST">
-    <div>
-        <label for="processor">Процессор:</label>
-        <select id="processor" name="processor">
-            <!-- Здесь будут варианты выбора процессора -->
-        </select>
-    </div>
-    <div>
-        <label for="motherboard">Материнская плата:</label>
-        <select id="motherboard" name="motherboard">
-            <!-- Здесь будут варианты выбора материнской платы -->
-        </select>
-    </div>
-    <div>
-        <label for="case">Корпус:</label>
-        <select id="case" name="case">
-            <!-- Здесь будут варианты выбора корпуса -->
-        </select>
-    </div>
-    <div>
-        <label for="gpu">Видеокарта:</label>
-        <select id="gpu" name="gpu">
-            <!-- Здесь будут варианты выбора видеокарты -->
-        </select>
-    </div>
-    <div>
-        <label for="cpuCooler">Охлаждение процессора:</label>
-        <select id="cpuCooler" name="cpuCooler">
-            <!-- Здесь будут варианты выбора охлаждения процессора -->
-        </select>
-    </div>
-    <div>
-        <label for="ram">Оперативная память:</label>
-        <select id="ram" name="ram">
-            <!-- Здесь будут варианты выбора оперативной памяти -->
-        </select>
-    </div>
-    <div>
-        <label for="storage">Накопитель памяти:</label>
-        <select id="storage" name="storage">
-            <!-- Здесь будут варианты выбора накопителя памяти -->
-        </select>
-    </div>
-    <div>
-        <label for="powerSupply">Блок питания:</label>
-        <select id="powerSupply" name="powerSupply">
-            <!-- Здесь будут варианты выбора блока питания -->
-        </select>
-    </div>
-    <button type="submit">Собрать ПК</button>
-</form>
-</body>
-</html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Конструктор ПК</title>
+        <!-- Подключение jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            console.log($); // Должен вывести функцию jQuery
+            console.log(jQuery); // Должен вывести функцию jQuery
+
+            function enableFields() {
+                const fields = document.querySelectorAll('#pc-builder-form select, #pc-builder-form button[type="button"]');
+                fields.forEach(field => field.disabled = false);
+            }
+        </script>
+        <script>
+            (function($) {
+                function showCompatibleProducts(productType) {
+                    $.ajax({
+                        type: "GET",
+                        url: `/pcbuilder/compatibleProduct`,
+                        data: {
+                            productType: productType.toLowerCase() // Передаем строковое значение
+                        },
+                        success: function(products) {
+                            const selectElement = document.getElementById(productType.toLowerCase());
+                            if (selectElement) {
+                                selectElement.innerHTML = "";
+
+                                products.forEach(product => {
+                                    const option = document.createElement("option");
+                                    option.value = product.id;
+                                    option.textContent = product.title;
+                                    selectElement.appendChild(option);
+
+                                    const addButton = document.createElement("button");
+                                    addButton.textContent = "Добавить в сборку";
+                                    addButton.addEventListener("click", function() {
+                                        addToBuild(product.id, productType.toUpperCase());
+                                    });
+                                    selectElement.parentElement.appendChild(addButton);
+                                });
+
+                                selectElement.disabled = false;
+                            } else {
+                                console.error("Элемент не найден:", productType.toLowerCase());
+                            }
+                        },
+                    });
+                }
+
+                function addToBuild(productId, productType) {
+                    $.ajax({
+                        type: "POST",
+                        url: `/pcbuilder/addToBuild`,
+                        data: {
+                            productId: productId,
+                            productType: productType.toLowerCase()
+                        },
+                        success: function(response) {
+                            alert("Продукт добавлен в сборку!");
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Ошибка при добавлении продукта в сборку:", error);
+                        }
+                    });
+                }
+
+                function saveBuild() {
+                    const build = {
+                        cpu: $('#processor').val(),
+                        motherboard: $('#motherboard').val(),
+                        systemUnit: $('#case').val(),
+                        gpu: $('#gpu').val(),
+                        cooler: $('#cpuCooler').val(),
+                        ram: $('#ram').val(),
+                        drive: $('#storage').val(),
+                        psu: $('#powerSupply').val()
+                    };
+
+                    $.ajax({
+                        type: "POST",
+                        url: `/pcbuilder/saveBuild`, // Обновленный URL
+                        data: JSON.stringify(build),
+                        contentType: "application/json",
+                        success: function(response) {
+                            alert("Сборка сохранена!");
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Ошибка при сохранении сборки:", error);
+                        }
+                    });
+                }
+
+                document.addEventListener("DOMContentLoaded", function() {
+                    const selectButtons = document.querySelectorAll('button[id^="select"]');
+                    selectButtons.forEach(button => {
+                        button.addEventListener("click", function() {
+                            const productType = this.id.replace("select", "").toLowerCase();
+                            showCompatibleProducts(productType);
+                        });
+                    });
+
+                    const saveButton = document.querySelector('button[type="submit"]');
+                    saveButton.addEventListener("click", function(event) {
+                        event.preventDefault();
+                        saveBuild();
+                    });
+                });
+            })(jQuery);
+        </script>
+    </head>
+    <body>
+    <h1>Конструктор ПК</h1>
+    <button onclick="enableFields()">Начать сборку</button>
+    <form id="pc-builder-form" action="/build" method="POST">
+        <div>
+            <label for="cpu">Процессор:</label>
+            <button type="button" id="selectCPU" disabled>Выбрать</button>
+        </div>
+        <div>
+            <label for="motherboard">Материнская плата:</label>
+            <button type="button" id="selectMotherboard" disabled>Выбрать</button>
+        </div>
+        <div>
+            <label for="case">Корпус:</label>
+            <button type="button" id="selectCase" disabled>Выбрать</button>
+        </div>
+        <div>
+            <label for="gpu">Видеокарта:</label>
+            <button type="button" id="selectGpu" disabled>Выбрать</button>
+        </div>
+        <div>
+            <label for="cooler">Охлаждение процессора:</label>
+            <button type="button" id="selectCooler" disabled>Выбрать</button>
+        </div>
+        <div>
+            <label for="ram">Оперативная память:</label>
+            <button type="button" id="selectRAM" disabled>Выбрать</button>
+        </div>
+        <div>
+            <label for="drive">Накопитель памяти:</label>
+            <button type="button" id="selectDrive" disabled>Выбрать</button>
+        </div>
+        <div>
+            <label for="psu">Блок питания:</label>
+            <button type="button" id="selectPSU" disabled>Выбрать</button>
+        </div>
+        <button type="submit" disabled>Собрать ПК</button>
+    </form>
+    </body>
 </@t.template>
