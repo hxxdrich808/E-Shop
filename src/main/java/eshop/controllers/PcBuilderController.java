@@ -2,15 +2,13 @@ package eshop.controllers;
 
 import eshop.models.Build;
 import eshop.models.Product;
-import eshop.models.ProductCompatibility;
 import eshop.models.enums.ProductType;
-import eshop.repositories.ProductCompatibilityRepository;
 import eshop.servives.PcBuilderService;
 import eshop.servives.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
