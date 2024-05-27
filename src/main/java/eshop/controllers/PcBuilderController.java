@@ -6,13 +6,13 @@ import eshop.models.enums.ProductType;
 import eshop.servives.PcBuilderService;
 import eshop.servives.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
@@ -27,14 +27,18 @@ public class PcBuilderController {
         model.addAttribute("user", productService.getUserByPrincipal(principal));
         model.addAttribute("Products",productService.listProducts(Title));
         model.addAttribute("ProductType", ProductType.class);
+        List<Product> products = productService.listProducts(Title);
+        for (Product product : products){
+            System.out.println(product.getProductType());
+        }
         return "pc-builder";
     }
 
     @GetMapping("/pcbuilder/compatibleProduct")
-    public ResponseEntity<List<Product>> getCompatibleProducts(@RequestParam String productType) {
+    @ResponseBody
+    public List<Product> getCompatibleProducts(@RequestParam String productType) {
         ProductType type = ProductType.valueOf(productType.toUpperCase());
-        List<Product> compatibleProducts = pcBuilderService.getCompatibleProduct(type);
-        return ResponseEntity.ok(compatibleProducts);
+        return pcBuilderService.getCompatibleProduct(type);
     }
 
     @PostMapping("/pcbuilder/addToBuild")

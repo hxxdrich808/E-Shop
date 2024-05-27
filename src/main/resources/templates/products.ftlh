@@ -1,26 +1,23 @@
 <#import "blocks/template.ftlh" as t>
 <@t.template user>
-    <h4>Магазины по всей России</h4>
-    <div class="form-row">
-        <div class="form-group col-md-10">
-            <label for="searchWord">Поиск по объявлениям</label>
-            <input type="text" name="searchWord" <#if searchWord??>value="${searchWord}"</#if> class="form-control"
+    <h4 class="products-sub">Магазины по всей России</h4>
+    <div class="input-box">
+        <div class="products-input">
+            <input type="text" name="searchWord" placeholder="Поиск по объявлениям" <#if searchWord??>value="${searchWord}"</#if> class="form-control"
                    id="searchWord">
         </div>
-        <button style="width: 100%" type="submit" class="btn btn-dark">Поиск</button>
+        <button type="submit" class="hover">
+            <img src="../static/images/loop.svg" alt="Поиск">
+        </button>
     </div>
-    <hr>
     <div class="card-columns">
         <#list Products as product>
-            <div class = "product-link-container">
+            <div class="product-link-container">
                 <a href="/Product/${product.id}" class="product-link">
-                    <div class="card text-white bg-dark my-3 product">
-                        <img src="/images/${product.previewImageId}"
-                             class="card-img-top">
-                        <div class="card-body">
-                            <h5 class="card-title">${product.title}</h5>
-                            <p class="card-text">${product.price} ₽</p>
-                        </div>
+                    <div class="product-image-box" style="background-image: url('/images/${product.previewImageId}')"></div>
+                    <div class="card-body">
+                        <h5 class="card-title">${product.title}</h5>
+                        <p class="card-text">${product.price} ₽</p>
                     </div>
                 </a>
             </div>
@@ -28,5 +25,4 @@
             <h1 style="text-align: center">Не найдено</h1>
         </#list>
     </div>
-    <hr>
 </@t.template>

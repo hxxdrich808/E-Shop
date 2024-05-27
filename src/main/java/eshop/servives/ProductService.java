@@ -57,7 +57,7 @@ public class ProductService {
         productFromDB.setPreviewImageId(productFromDB.getImages().get(0).getId());
         productRepository.save(product);
         switch (productType){
-            case CPU,MOTHERBOARD,CASE,GPU,RAM,DRIVE ->{
+            case CPU,MOTHERBOARD,CASE,GPU,RAM,DRIVE,PSU ->{
                 productCompatibility.setProduct(product);
                 productCompatibilityRepository.save(productCompatibility);
             }
@@ -81,6 +81,7 @@ public class ProductService {
 
     public void deleteProduct(Long id){
         log.info("Deleting product {}",id);
+        productCompatibilityRepository.deleteById(id);
         productRepository.deleteById(id);
     }
 

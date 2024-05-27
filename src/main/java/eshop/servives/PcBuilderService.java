@@ -10,6 +10,8 @@ import eshop.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,7 @@ public class PcBuilderService {
     private String format;
     private boolean m2Slot;
 
+//    сделать так, чтобы метод возвращал только листы продуктов, а нужные переменные забирал метод addToBuild
     public List<Product> getCompatibleProduct(ProductType productType) {
         switch (productType) {
             case CPU -> {
