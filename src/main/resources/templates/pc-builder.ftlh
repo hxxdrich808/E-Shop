@@ -3,12 +3,14 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="_csrf" content="${_csrf.token}">
+        <meta name="_csrf_header" content="${_csrf.headerName}">
         <title>Конструктор ПК</title>
-        <!-- Подключение jQuery -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script>
-            console.log($); // Должен вывести функцию jQuery
-            console.log(jQuery); // Должен вывести функцию jQuery
+            console.log($);
+            console.log(jQuery);
 
             function enableFields() {
                 const fields = document.querySelectorAll('#pc-builder-form select, #pc-builder-form button[type="button"]');
@@ -22,10 +24,16 @@
                         type: "GET",
                         url: `/pcbuilder/compatibleProduct`,
                         data: {
-                            productType: productType.toUpperCase() // Передаем строковое значение
+                            productType: productType.toUpperCase()
                         },
                         success: function(products) {
                             const selectElement = productType.toUpperCase();
+                            const selector = document.querySelector(".selector" + productType.toUpperCase())
+                            if (selector.hasChildNodes()) {
+                                while (selector.firstChild) {
+                                    selector.removeChild(selector.firstChild);
+                                }
+                            }
                             if (selectElement) {
                                 selectElement.innerHTML = "";
                                 products.forEach(product => {
@@ -51,16 +59,17 @@
                                     productInfo.appendChild(name);
                                     productInfo.appendChild(price);
 
+                                    const option2 = document.createElement("option");
+                                    option2.value = product.id;
+                                    option2.textContent = product.title;
+                                    option2.id = productType.toLowerCase();
+                                    const selector = document.querySelector(".selector" + productType.toUpperCase());
+                                    selector.appendChild(option2);
+
                                     option.addEventListener("click", function () {
+                                        selector.value = product.id;
                                         addToBuild(product.id, productType.toUpperCase(), product.title);
                                     })
-
-                                    // const addButton = document.createElement("button");
-                                    // addButton.textContent = "Добавить в сборку";
-                                    // addButton.addEventListener("click", function() {
-                                    //     addToBuild(product.id, productType.toUpperCase());
-                                    // });
-                                    // element.parentElement.appendChild(addButton); // Добавляем кнопку рядом с select
                                 });
 
                                 selectElement.disabled = false;
@@ -72,18 +81,23 @@
                 }
 
                 function addToBuild(productId, productType, title) {
-                    // const csrfToken = document.querySelector('input[name="_csrf"]').value;
                     $.ajax({
-                        type: "POST",
+                        type: "GET",
                         url: `/pcbuilder/addToBuild`,
                         data: {
                             productId: productId,
-                            productType: productType.toUpperCase()
+                            productType: productType.toUpperCase(),
+                            cpu: $('#processor').val(),
+                            motherboard: $('#motherboard').val(),
+                            systemUnit: $('#case').val(),
+                            gpu: $('#gpu').val(),
+                            cooler: $('#cooler').val(),
+                            ram: $('#ram').val(),
+                            drive: $('#drive').val(),
+                            psu: $('#psu').val()
                         },
-                        // headers: {
-                        //     'X-CSRF-Token': csrfToken
-                        // },
                         success: function(response) {
+                            console.log(response)
                             const text = document.querySelector(".label" + productType.toUpperCase());
                             const chosen = document.createElement("div");
                             chosen.textContent = title;
@@ -103,29 +117,66 @@
                 }
 
                 function saveBuild() {
-                    const build = {
-                        cpu: $('#processor').val(),
-                        motherboard: $('#motherboard').val(),
-                        systemUnit: $('#case').val(),
-                        gpu: $('#gpu').val(),
-                        cooler: $('#cpuCooler').val(),
-                        ram: $('#ram').val(),
-                        drive: $('#storage').val(),
-                        psu: $('#powerSupply').val()
-                    };
-
                     $.ajax({
-                        type: "POST",
-                        url: `/pcbuilder/saveBuild`, // Обновленный URL
-                        data: JSON.stringify(build),
-                        contentType: "application/json",
+                        type: "GET",
+                        url: `/pcbuilder/saveBuild`,
                         success: function(response) {
+                            createAndDownloadPdf(response);
+                            console.log(response)
                             alert("Сборка сохранена!");
                         },
                         error: function(xhr, status, error) {
                             console.error("Ошибка при сохранении сборки:", error);
                         }
                     });
+                }
+
+                function downloadBuild(link) {
+                    $.ajax({
+                        type: "GET",
+                        url: `/pcbuilder/download`,
+                        success: function (response) {
+                            const blob = new Blob([response], { type: 'application/pdf' });
+                            const link = document.createElement('a');
+                            link.href = window.URL.createObjectURL(blob);
+                            link.download = 'build.pdf';
+                            link.click();
+                        }
+                    })
+                }
+
+                function createAndDownloadPdf(data) {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+
+                    doc.text("PC configuration:", 10, 10);
+
+                    if (data.cpu) {
+                        doc.text("CPU: " + data.cpu, 10, 20);
+                    }
+                    if (data.motherboard) {
+                        doc.text("Motherboard: " + data.motherboard, 10, 30);
+                    }
+                    if (data.ram) {
+                        doc.text("RAM: " + data.ram, 10, 40);
+                    }
+                    if (data.gpu) {
+                        doc.text("GPU: " + data.gpu, 10, 50);
+                    }
+                    if (data.psu) {
+                        doc.text("PSU: " + data.psu, 10, 60);
+                    }
+                    if (data.systemUnit) {
+                        doc.text("Case: " + data.systemUnit, 10, 70);
+                    }
+                    if (data.cooler) {
+                        doc.text("Cooler: " + data.cooler, 10, 80);
+                    }
+                    if (data.drive) {
+                        doc.text("Drive: " + data.drive, 10, 90);
+                    }
+
+                    doc.save('build.pdf');
                 }
 
                 document.addEventListener("DOMContentLoaded", function() {
@@ -148,8 +199,9 @@
                         });
                     });
 
-                    const saveButton = document.querySelector('button[type="submit"]');
+                    const saveButton = document.querySelector(".build-btn");
                     saveButton.addEventListener("click", function(event) {
+                        console.log("clicked")
                         event.preventDefault();
                         saveBuild();
                     });
@@ -159,50 +211,56 @@
     </head>
     <body>
     <h1 class="builder-sub">Конструктор ПК</h1>
-<#--    <input class="csrf" type="hidden" name="_csrf" value="${_csrf.token}">-->
-<#--    <button class="start-build hover" onclick="enableFields()">Начать сборку</button>-->
-    <form class="pc-builder-form" id="pc-builder-form" action="/build" method="POST">
+    <form class="pc-builder-form" id="pc-builder-form" action="/pcbuilder/saveBuild" method="GET">
         <div class="builder-item" id="selectCPU">
             <label class="labelCPU" for="cpu">Процессор</label>
             <img class="arrCPU" src="../static/images/arrow2.svg">
         </div>
+        <select class="invisibleSelector selectorCPU" id="processor"></select>
         <div class="selectCPU select-item"></div>
         <div class="builder-item" id="selectMOTHERBOARD">
             <label class="labelMOTHERBOARD" for="motherboard">Материнская плата</label>
             <img class="arrMOTHERBOARD" src="../static/images/arrow2.svg">
         </div>
+        <select class="invisibleSelector selectorMOTHERBOARD" id="motherboard"></select>
         <div class="selectMOTHERBOARD select-item"></div>
         <div class="builder-item" id="selectCASE">
             <label class="labelCASE" for="case">Корпус</label>
             <img class="arrCASE" src="../static/images/arrow2.svg">
         </div>
+        <select class="invisibleSelector selectorCASE" id="case"></select>
         <div class="selectCASE select-item"></div>
         <div class="builder-item" id="selectGPU">
             <label class="labelGPU" for="gpu">Видеокарта</label>
             <img class="arrGPU" src="../static/images/arrow2.svg">
         </div>
+        <select class="invisibleSelector selectorGPU" id="gpu"></select>
         <div class="selectGPU select-item"></div>
         <div class="builder-item" id="selectCOOLER">
             <label class="labelCOOLER" for="cooler">Охлаждение процессора</label>
             <img class="arrCOOLER" src="../static/images/arrow2.svg">
         </div>
+        <select class="invisibleSelector selectorCOOLER" id="cooler"></select>
         <div class="selectCOOLER select-item"></div>
         <div class="builder-item" id="selectRAM">
             <label class="labelRAM" for="ram">Оперативная память</label>
             <img class="arrRAM" src="../static/images/arrow2.svg">
         </div>
+        <select class="invisibleSelector selectorRAM" id="ram"></select>
         <div class="selectRAM select-item"></div>
         <div class="builder-item" id="selectDRIVE">
             <label class="labelDRIVE" for="drive">Накопитель памяти</label>
             <img class="arrDRIVE" src="../static/images/arrow2.svg">
         </div>
+        <select class="invisibleSelector selectorDRIVE" id="drive"></select>
         <div class="selectDRIVE select-item"></div>
         <div class="builder-item" id="selectPSU">
             <label class="labelPSU" for="psu">Блок питания</label>
             <img class="arrPSU" src="../static/images/arrow2.svg">
         </div>
+        <select class="invisibleSelector selectorPSU" id="psu"></select>
         <div class="selectPSU select-item"></div>
-        <button class="build-btn hover" type="submit" disabled>Собрать ПК</button>
+        <button class="build-btn hover" type="submit">Собрать ПК</button>
     </form>
     </body>
 </@t.template>

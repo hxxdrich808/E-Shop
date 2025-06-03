@@ -1,7 +1,7 @@
 <#import "blocks/template.ftlh" as t>
 <@t.template user>
-    `<h1 style="text-align: center">Панель администратора</h1><hr>
-    <table class="table table-hover table-dark">
+    <h1 class="admin-sub">Панель администратора</h1>
+    <table class="table">
         <tr>
             <th scope="col">Email</th>
             <th scope="col">Номер телефона</th>
@@ -13,21 +13,51 @@
         </tr>
         <#list users as user>
             <tr>
-                <th>${user.email}</th>
-                <th>${user.phoneNumber}</th>
-                <th><#if user.active>true<#else>false</#if></th>
-                <th><#list user.roles as role>${role}</#list></th>
-                <th>
+                <td>${user.email}</td>
+                <td class="admin-phone">${user.phoneNumber}</td>
+                <td><#if user.active>true<#else>false</#if></td>
+                <td><#list user.roles as role>${role}</#list></td>
+                <td>
                     <form action="/admin/user/ban/${user.id}" method="post">
                         <input type="hidden" name="_csrf" value="${_csrf.token}">
-                        <input type="submit" class="btn btn-light" value="Бан">
+                        <input type="submit" class="ban-btn hover" value="Бан">
                     </form>
-                </th>
-                <th><a href="/admin/user/edit/${user.id}">Редактировние</a></th>
-                <th><a href="/user/${user.id}">Подробная информация</a></th>
+                </td>
+                <td><a class="underlined" href="/admin/user/edit/${user.id}">Редактировние</a></td>
+                <td><a class="underlined" href="/user/${user.id}">Подробная информация</a></td>
             </tr>
         <#else>
             <h3>Пользователей нет</h3>
         </#list>
     </table>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const phones = document.getElementsByClassName("admin-phone")
+            for (let i of phones) {
+                i.textContent = formatPhoneNumber(i.innerHTML)
+            }
+        });
+
+        function formatPhoneNumber(phoneNumber) {
+            const cleaned = ('' + phoneNumber).replace(/\D/g, '');
+            const hasPlus = cleaned.charAt(0) === '+';
+            let formattedNumber;
+            if (hasPlus) {
+                const match = cleaned.match(/^\+(\d{1})(\d{3})(\d{3})(\d{2})(\d{2})$/);
+                if (match) {
+                    formattedNumber = '+' + match[1] + ' (' + match[2] + ') ' + match[3] + '-' + match[4] + '-' + match[5];
+                } else {
+                    formattedNumber = phoneNumber;
+                }
+            } else {
+                const match = cleaned.match(/^(\d{1})(\d{3})(\d{3})(\d{2})(\d{2})$/);
+                if (match) {
+                    formattedNumber = '+' + match[1] + ' (' + match[2] + ') ' + match[3] + '-' + match[4] + '-' + match[5];
+                } else {
+                    formattedNumber = phoneNumber;
+                }
+            }
+            return formattedNumber;
+        }
+    </script>
 </@t.template>

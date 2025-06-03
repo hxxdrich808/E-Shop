@@ -2,16 +2,9 @@
     <!doctype html>
     <html lang="ru">
     <head>
-        <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="../../static/css/style.css">
-
-        <!-- Bootstrap CSS -->
-<#--        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"-->
-<#--              integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn"-->
-<#--              crossorigin="anonymous">-->
-
         <title>E-Shop</title>
     </head>
     <body>
@@ -86,15 +79,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
             integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
             crossorigin="anonymous"></script>
-    <script>
-        // $(document).ready(function () {
-        //     $(".avatar-icon").hover(function () {
-        //         $(".avatar-logout").show();
-        //     }, function () {
-        //         $(".avatar-logout").hide();
-        //     });
-        // });
-    </script>
     </body>
     </html>
 </#macro>

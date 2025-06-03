@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+
+  postgres:
+    container_name: eshop-postgres
+    image: postgres:14
+    hostname: sm-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ESHOP
+      POSTGRES_PORT: 5432
+    ports:
+      - "5432:5432"
+    networks:
+      - eshop-net
+
+networks:
+  eshop-net:

@@ -23,15 +23,19 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name ="id")
+    @Column(name = "id")
     private Long id;
-    @Column(name ="title")
+    @Column(name = "title")
     private String title;
-    @Column(name ="description",columnDefinition = "text")
+    @Column(name = "manufacturer")
+    private String manufacturer;
+    @Column(name = "amount", columnDefinition = "int")
+    private int amount;
+    @Column(name = "description", columnDefinition = "text")
     private String description;
-    @Column(name ="price")
+    @Column(name = "price")
     private int price;
-    @Column(name ="product_type")
+    @Column(name = "product_type")
     @Enumerated(EnumType.STRING)
     private ProductType productType;
 
@@ -42,11 +46,24 @@ public class Product {
     private LocalDateTime dateOfCreated;
 
     @PrePersist
-    private void init(){
+    private void init() {
         dateOfCreated = LocalDateTime.now();
     }
 
-    public void addImageToProduct(Image image){
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", productType=" + productType +
+                ", dateOfCreated=" + dateOfCreated +
+                '}';
+    }
+
+    public void addImageToProduct(Image image) {
         image.setProduct(this);
         images.add(image);
     }

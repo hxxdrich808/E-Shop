@@ -3,34 +3,35 @@ package eshop.controllers;
 import eshop.models.Build;
 import eshop.models.Product;
 import eshop.models.enums.ProductType;
-import eshop.servives.PcBuilderService;
-import eshop.servives.ProductService;
+import eshop.repositories.BuildRepository;
+import eshop.services.implementations.PcBuilderServiceImpl;
+import eshop.services.implementations.ProductServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.apache.commons.io.IOUtils;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.io.*;
 import java.security.Principal;
 import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 public class PcBuilderController {
-    private final ProductService productService;
-    private final PcBuilderService pcBuilderService;
+    private final ProductServiceImpl productService;
+    private final PcBuilderServiceImpl pcBuilderService;
+    private final BuildRepository buildRepository;
+    Build build;
+
     @GetMapping("pcbuilder")
-    public String pcBuilder(@RequestParam(name = "title",required = false) String Title, Principal principal, Model model){
+    public String pcBuilder(@RequestParam(name = "title", required = false) String Title,
+                            Principal principal, Model model) {
         model.addAttribute("user", productService.getUserByPrincipal(principal));
-        model.addAttribute("Products",productService.listProducts(Title));
+        model.addAttribute("Products", productService.listProducts(Title));
         model.addAttribute("ProductType", ProductType.class);
         List<Product> products = productService.listProducts(Title);
-        for (Product product : products){
-            System.out.println(product.getProductType());
-        }
         return "pc-builder";
     }
 
@@ -41,16 +42,30 @@ public class PcBuilderController {
         return pcBuilderService.getCompatibleProduct(type);
     }
 
-    @PostMapping("/pcbuilder/addToBuild")
-    public ResponseEntity<Void> addToBuild(@RequestParam String productId, @RequestParam String productType, @RequestBody Build build) {
+    @GetMapping("/pcbuilder/addToBuild")
+    @ResponseBody
+    public String addToBuild(@RequestParam Long productId, @RequestParam String productType, @RequestParam String cpu,
+                             @RequestParam String motherboard, @RequestParam String systemUnit,
+                             @RequestParam String gpu, @RequestParam String cooler, @RequestParam String ram,
+                             @RequestParam String drive, @RequestParam String psu) {
+        build = new Build(productId, cpu, motherboard, systemUnit, gpu, cooler, ram, drive, psu);
         ProductType type = ProductType.valueOf(productType.toUpperCase());
-        pcBuilderService.addToBuild(productId, type, build);
-        return ResponseEntity.ok().build();
+        pcBuilderService.addToBuild(String.valueOf(productId), type, build);
+        return "product added";
     }
 
-    @PostMapping("/pcbuilder/saveBuild")
-    public ResponseEntity<Void> saveBuild(@RequestBody Build build) {
-        pcBuilderService.saveBuild(build);
-        return ResponseEntity.ok().build();
+    @GetMapping("/pcbuilder/saveBuild")
+    @ResponseBody
+    public Build saveBuild() {
+        return pcBuilderService.saveBuild(build);
     }
+
+    @GetMapping(
+            value = "/pcbuilder/download",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody byte[] getFile() throws IOException {
+        InputStream in = new FileInputStream("C:\\Users\\hxxdrichXD\\IdeaProjects\\E-Shop\\src\\main\\resources\\files\\build.pdf");
+        return IOUtils.toByteArray(in);
+    }
+
 }
