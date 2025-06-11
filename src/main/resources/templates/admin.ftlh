@@ -10,6 +10,7 @@
             <th scope="col">Бан</th>
             <th scope="col">Редактирование</th>
             <th scope="col">Подробная информация</th>
+            <th scope="col">Заказы</th>
         </tr>
         <#list users as user>
             <tr>
@@ -25,6 +26,12 @@
                 </td>
                 <td><a class="underlined" href="/admin/user/edit/${user.id}">Редактировние</a></td>
                 <td><a class="underlined" href="/user/${user.id}">Подробная информация</a></td>
+                <td><a class="underlined" href="orders/listUserOrders/${user.id}">Просмотр</a></td>
+<#--                <td>-->
+<#--                    <form action="orders/listUserOrders/${user.id}" method="get">-->
+<#--                        <a class="underlined" href="/user/${user.id}">Подробная информация</a>-->
+<#--                    </form>-->
+<#--                </td>-->
             </tr>
         <#else>
             <h3>Пользователей нет</h3>
