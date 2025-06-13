@@ -26,12 +26,7 @@
                 </td>
                 <td><a class="underlined" href="/admin/user/edit/${user.id}">Редактировние</a></td>
                 <td><a class="underlined" href="/user/${user.id}">Подробная информация</a></td>
-                <td><a class="underlined" href="orders/listUserOrders/${user.id}">Просмотр</a></td>
-<#--                <td>-->
-<#--                    <form action="orders/listUserOrders/${user.id}" method="get">-->
-<#--                        <a class="underlined" href="/user/${user.id}">Подробная информация</a>-->
-<#--                    </form>-->
-<#--                </td>-->
+                <td><a class="underlined" href="/orders/user/${user.id}">Просмотр</a></td>
             </tr>
         <#else>
             <h3>Пользователей нет</h3>

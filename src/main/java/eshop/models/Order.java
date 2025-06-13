@@ -1,46 +1,48 @@
 package eshop.models;
 
+import eshop.models.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-
-@Entity
-@Table(name = "Orders")
+@Entity(name = "orders")
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
-    private Status status;
-
-    private LocalDateTime orderDate;
-
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToMany
-    @JoinTable(
-            name = "order_products",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private List<Product> products;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> items;
 
-    @PrePersist
-    private void init() {
-        orderDate = LocalDateTime.now();
+    private LocalDateTime date;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+    private double totalPrice;
+
+    @Transient
+    private String formattedDate;
+
+    public String getFormattedDate() {
+        if (this.date != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+            return this.date.format(formatter);
+        }
+        return "";
     }
 }

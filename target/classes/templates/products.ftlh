@@ -40,7 +40,6 @@
                         const value = input.value.toLowerCase()
                         if (title.includes(value)) {
                             i.classList.remove("none-product")
-                            // console.log(1)
                         } else {
                             i.classList.add("none-product")
                         }

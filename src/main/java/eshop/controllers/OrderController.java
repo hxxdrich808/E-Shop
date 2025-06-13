@@ -1,41 +1,49 @@
 package eshop.controllers;
 
-import eshop.models.Status;
-import eshop.models.enums.OrderStatus;
-import eshop.services.implementations.OrderServiceImpl;
+import eshop.models.Order;
+import eshop.models.User;
+import eshop.repositories.OrderRepository;
+import eshop.services.OrderService;
 import eshop.services.implementations.ProductServiceImpl;
+import eshop.services.implementations.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/orders")
 public class OrderController {
-    private final ProductServiceImpl productService;
-    private final OrderServiceImpl orderService;
 
-    @GetMapping("/listUserOrders")
-    public String orders (@PathVariable Long userId,
-                         Model model,
-                         Principal principal){
-        model.addAttribute("user", productService.getUserByPrincipal(principal));
-        model.addAttribute("Orders", orderService.getOrdersByUserId(userId));
-        model.addAttribute("Statuses", OrderStatus.values());
-        return "/user-orders";
+    private final OrderService orderService;
+    private final UserServiceImpl userService;
+    private final OrderRepository orderRepository;
+    private final ProductServiceImpl productService;
+
+    @PostMapping("/cart/checkout")
+    public String checkout(Principal principal, Model model) {
+        User user = userService.getUserByPrincipal(principal);
+        orderService.createOrderFromCart(user);
+        return "redirect:/orders/my";
     }
 
-    @PostMapping("/updateStatus")
-    public String updateOrderStatus(@RequestParam("orderId") Long orderId,
-                                    @RequestParam("status") Status status,
-                                    Principal principal,
-                                    Model model) {
-        model.addAttribute("Orders", orderService.getOrders());
-        model.addAttribute("user", productService.getUserByPrincipal(principal));
-        orderService.updateOrderStatus(orderId, status);
-        return "redirect:/orders/";
+    @GetMapping("/orders/my")
+    public String myOrders(Principal principal, Model model) {
+        User user = userService.getUserByPrincipal(principal);
+        List<Order> orders = orderRepository.findAllByUser(user);
+        model.addAttribute("orders", orders);
+        model.addAttribute("user", user);
+        return "user-orders";  // создадим этот шаблон ниже
+    }
+
+    @PostMapping("/order/create")
+    public String createOrder(Principal principal) {
+        User user = productService.getUserByPrincipal(principal);
+        orderService.createOrderFromCart(user);
+        return "redirect:/my-orders";
     }
 }

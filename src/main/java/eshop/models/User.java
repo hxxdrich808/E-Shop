@@ -30,6 +30,9 @@ public class User implements UserDetails {
     @Column(name = "password", length = 1000)
     private String password;
 
+    @OneToOne
+    private Cart cart;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "image_id")
     private Image avatar;

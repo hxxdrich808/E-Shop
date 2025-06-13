@@ -1,12 +1,11 @@
 package eshop.repositories;
 
 import eshop.models.Order;
+import eshop.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
-public interface OrderRepository extends JpaRepository<Order, Integer> {
-    List<Order> findByUserId(Long userId);
+public interface OrderRepository extends JpaRepository<Order, Long> {
+    List<Order> findAllByUser(User user);
 }
