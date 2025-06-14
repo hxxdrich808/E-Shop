@@ -1,11 +1,8 @@
 package eshop.services.implementations;
 
 import eshop.exceptions.ConvertationException;
-import eshop.models.ProductCompatibility;
+import eshop.models.*;
 import eshop.models.enums.ProductType;
-import eshop.models.Image;
-import eshop.models.Product;
-import eshop.models.User;
 import eshop.repositories.ProductCompatibilityRepository;
 import eshop.repositories.ProductRepository;
 import eshop.repositories.UserRepository;
@@ -104,5 +101,44 @@ public class ProductServiceImpl implements ProductService {
             throw new ConvertationException(e.getMessage());
         }
         return image;
+    }
+
+    @Override
+    public List<Product> filterProducts(String type, String manufacturer, Double minPrice, Double maxPrice, Boolean inStock) {
+
+        return productRepository.findAll().stream()
+                .filter(p -> type == null || p.getProductType().toString().equals(type))
+                .filter(p -> manufacturer == null || p.getManufacturer().equals(manufacturer))
+                .filter(p -> minPrice == null || p.getPrice() >= minPrice)
+                .filter(p -> maxPrice == null || p.getPrice() <= maxPrice)
+                .filter(p -> inStock == null || !inStock || p.getAmount() > 0)
+                .toList();
+    }
+
+    @Override
+    public List<String> getAllManufacturers() {
+        return productRepository.findAllManufacturers();
+    }
+
+    public Double getAverageRating(Long productId) {
+        Product product = productRepository.findById(productId).orElse(null);
+        if (product == null || product.getReviews().isEmpty()) return 0.0;
+        return product.getReviews().stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
+
+    public List<Product> getProductsSortedByRating() {
+        List<Product> products = productRepository.findAll();
+
+        // сортируем по среднему рейтингу
+        products.sort((p1, p2) -> {
+            double r1 = getAverageRating(p1.getId());
+            double r2 = getAverageRating(p2.getId());
+            return Double.compare(r2, r1); // по убыванию
+        });
+
+        return products;
     }
 }

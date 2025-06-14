@@ -45,6 +45,9 @@ public class Product {
     private Long previewImageId;
     private LocalDateTime dateOfCreated;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
     @PrePersist
     private void init() {
         dateOfCreated = LocalDateTime.now();
@@ -66,5 +69,13 @@ public class Product {
     public void addImageToProduct(Image image) {
         image.setProduct(this);
         images.add(image);
+    }
+
+    @Transient
+    private Double averageRating;
+
+    public Double getAverageRating() {
+        if (reviews == null || reviews.isEmpty()) return 0.0;
+        return reviews.stream().mapToInt(Review::getRating).average().orElse(0.0);
     }
 }

@@ -1,13 +1,11 @@
 package eshop.services;
 
-import eshop.models.Image;
 import eshop.models.Product;
 import eshop.models.ProductCompatibility;
 import eshop.models.User;
 import eshop.models.enums.ProductType;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -24,5 +22,7 @@ public interface ProductService {
 
     ProductCompatibility getProductCompatibilityByProductId(Long productId);
 
+    List<String> getAllManufacturers();
 
+    List<Product> filterProducts(String type, String manufacturer, Double minPrice, Double maxPrice, Boolean inStock);
 }

@@ -46,6 +46,45 @@
                 </#if>
             </div>
         </div>
+        <div class="reviews-section">
+            <h3>Отзывы</h3>
+            <#if user??>
+                <form class="review-form" action="/Product/${product.id}/review"  method="post">
+                    <input type="hidden" name="_csrf" value="${_csrf.token}">
+                    <label for="rating">Ваша оценка:</label>
+                    <div class="stars">
+                        <#list 1..5 as i>
+                            <input type="radio" id="star${i}" name="rating" value="${i}" required>
+                            <label for="star${i}">★</label>
+                        </#list>
+                    </div>
+                    <textarea name="comment" maxlength="350" required placeholder="Ваш отзыв (до 350 символов)"></textarea>
+                    <button type="submit">Оставить отзыв</button>
+                </form>
+            <#else>
+                <div>Для отправки отзыва <a href="/login">войдите</a> на сайт</div>
+            </#if>
+
+            <div class="reviews-list">
+                <#if reviews?size == 0>
+                    <div>Нет отзывов</div>
+                <#else>
+                    <#list reviews as review>
+                        <div class="review-block">
+                            <div>
+                                <b>${review.author.name}</b> —
+                                <span>
+                            <#list 1..review.rating as _>★</#list>
+                        </span>
+                                <p>Создан: ${review.getFormattedCreatedDate()}</p>
+                            </div>
+                            <div>${review.comment}</div>
+                        </div>
+                    </#list>
+                </#if>
+            </div>
+        </div>
+
         <script>
             const sliderLeft = () => {
                 const images = document.getElementsByClassName("info-img-box");
