@@ -1,23 +1,33 @@
-    <#import "blocks/template.ftlh" as t>
-    <@t.template user>
-        <h4 class="info-sub">Подробная информация о товаре</h4>
-        <div class="info-row">
-            <div class="info-slider">
-                <img class="info-arr-left" src="../static/images/arrow.svg">
-                <#list images as img>
-                    <div class="info-img-box" style="background-image: url('/images/${img.id}')"></div>
-                </#list>
-                <img class="info-arr-right" src="../static/images/arrow.svg">
+<#import "blocks/template.ftlh" as t>
+<@t.template user>
+    <h4 class="info-sub">Подробная информация о товаре</h4>
+    <div class="info-row">
+        <div class="info-slider">
+            <img class="info-arr-left" src="../static/images/arrow.svg">
+            <#list images as img>
+                <div class="info-img-box" style="background-image: url('/images/${img.id}')"></div>
+            </#list>
+            <img class="info-arr-right" src="../static/images/arrow.svg">
+        </div>
+        <div class="info-box">
+            <div class="info-item">
+                <b>Название товара: </b>${product.title}
             </div>
-            <div class="info-box">
-                <div class="info-item">
-                    <b>Название товара: </b>${product.title}
-                </div>
+            <div class="info-item">
+                <b>Цена товара: </b>${product.price} ₽
+            </div>
+            <div class="info-item">
+                <b>Наличие: </b>${product.amount}
+            </div>
+
+            <!-- Кнопка Подробнее -->
+            <button class="btn btn-details hover" type="button" style="margin:10px 0;">
+                Подробнее
+            </button>
+            <!-- Скрытый блок характеристик -->
+            <div class="product-details" style="display:none; margin-bottom:14px;">
                 <div class="info-item">
                     <b>Производитель: </b>${product.manufacturer}
-                </div>
-                <div class="info-item">
-                    <b>Наличие: </b>${product.amount}
                 </div>
                 <div class="info-item">
                     <b>Описание товара: </b>${product.description}
@@ -34,138 +44,161 @@
                 <div class="info-item none-info" id="format">
                     <b>Формат: </b>${productCompatibility.format}
                 </div>
-                <div class="info-item">
-                    <b>Цена товара: </b>${product.price} ₽
-                </div>
-                <button class="buy-btn hover">Купить</button>
-                <#if user.isAdmin()>
-                    <form class="delete-product" action="/Product/delete/${product.id}" method="post">
-                        <input type="hidden" name="_csrf" value="${_csrf.token}">
-                        <input class="delete-btn hover" type="submit" value="Удалить товар"/>
-                    </form>
-                </#if>
             </div>
-        </div>
-        <div class="reviews-section">
-            <h3>Отзывы</h3>
-            <#if user??>
-                <form class="review-form" action="/Product/${product.id}/review"  method="post">
+            <!-- Кнопка в корзину -->
+            <form action="/cart/addFromProduct/${product.id}" method="post" style="margin: 12px;">
+                <input type="hidden" name="_csrf" value="${_csrf.token}">
+                <button type="submit" class="add-to-cart-btn">
+                    🛒 В корзину
+                </button>
+            </form>
+
+            <#if user.isAdmin()>
+                <form class="delete-product" action="/Product/delete/${product.id}" method="post">
                     <input type="hidden" name="_csrf" value="${_csrf.token}">
-                    <label for="rating">Ваша оценка:</label>
-                    <div class="stars">
-                        <#list 1..5 as i>
-                            <input type="radio" id="star${i}" name="rating" value="${i}" required>
-                            <label for="star${i}">★</label>
-                        </#list>
-                    </div>
-                    <textarea name="comment" maxlength="350" required placeholder="Ваш отзыв (до 350 символов)"></textarea>
-                    <button type="submit">Оставить отзыв</button>
+                    <input class="delete-btn hover" type="submit" value="Удалить товар"/>
                 </form>
-            <#else>
-                <div>Для отправки отзыва <a href="/login">войдите</a> на сайт</div>
             </#if>
-
-            <div class="reviews-list">
-                <#if reviews?size == 0>
-                    <div>Нет отзывов</div>
-                <#else>
-                    <#list reviews as review>
-                        <div class="review-block">
-                            <div>
-                                <b>${review.author.name}</b> —
-                                <span>
-                            <#list 1..review.rating as _>★</#list>
-                        </span>
-                                <p>Создан: ${review.getFormattedCreatedDate()}</p>
-                            </div>
-                            <div>${review.comment}</div>
-                        </div>
-                    </#list>
-                </#if>
-            </div>
         </div>
+    </div>
+    <div class="reviews-section">
+        <h3>Отзывы</h3>
+        <#if user??>
+            <form class="review-form" action="/Product/${product.id}/review"  method="post">
+                <input type="hidden" name="_csrf" value="${_csrf.token}">
+                <label for="rating">Ваша оценка:</label>
+                <div class="stars">
+                    <#list 1..5 as i>
+                        <input type="radio" id="star${i}" name="rating" value="${i}" required>
+                        <label for="star${i}">★</label>
+                    </#list>
+                </div>
+                <textarea name="comment" maxlength="350" required placeholder="Ваш отзыв (до 350 символов)"></textarea>
+                <button type="submit">Оставить отзыв</button>
+            </form>
+        <#else>
+            <div>Для отправки отзыва <a href="/login">войдите</a> на сайт</div>
+        </#if>
 
-        <script>
-            const sliderLeft = () => {
-                const images = document.getElementsByClassName("info-img-box");
-                let index;
-                for (let i = 0; i < images.length; i++) {
-                    if (!images[i].classList.contains("None")) {
-                        index = i;
-                        images[i].classList.add("None");
-                    }
-                }
-                if (images[index - 1]) {
-                    images[index - 1].classList.remove("None");
-                } else {
-                    images[images.length - 1].classList.remove("None");
-                }
-            }
+        <div class="reviews-list">
+            <#if reviews?size == 0>
+                <div>Нет отзывов</div>
+            <#else>
+                <#list reviews as review>
+                    <div class="review-block">
+                        <div>
+                            <b>${review.author.name}</b> —
+                            <span>
+                                <#list 1..review.rating as _>★</#list>
+                            </span>
+                            <p>Создан: ${review.getFormattedCreatedDate()}</p>
+                        </div>
+                        <div>${review.comment}</div>
+                    </div>
+                </#list>
+            </#if>
+        </div>
+    </div>
 
-            const sliderRight = () => {
-                const images = document.getElementsByClassName("info-img-box");
-                let index;
-                for (let i = 0; i < images.length; i++) {
-                    if (!images[i].classList.contains("None")) {
-                        index = i;
-                        images[i].classList.add("None");
-                    }
-                }
-                if (images[index + 1]) images[index + 1].classList.remove("None");
-                else images[0].classList.remove("None");
-            }
-
+    <script>
+        // Слайдер картинок
+        const sliderLeft = () => {
             const images = document.getElementsByClassName("info-img-box");
-            for (let i = 1; i < images.length; i++) {
-                images[i].classList.add("None");
+            let index;
+            for (let i = 0; i < images.length; i++) {
+                if (!images[i].classList.contains("None")) {
+                    index = i;
+                    images[i].classList.add("None");
+                }
             }
+            if (images[index - 1]) {
+                images[index - 1].classList.remove("None");
+            } else {
+                images[images.length - 1].classList.remove("None");
+            }
+        }
 
-            document.addEventListener('DOMContentLoaded', function() {
-                const left = document.querySelector(".info-arr-left");
-                const right = document.querySelector(".info-arr-right");
-                const button = document.querySelector(".buy-btn");
+        const sliderRight = () => {
+            const images = document.getElementsByClassName("info-img-box");
+            let index;
+            for (let i = 0; i < images.length; i++) {
+                if (!images[i].classList.contains("None")) {
+                    index = i;
+                    images[i].classList.add("None");
+                }
+            }
+            if (images[index + 1]) images[index + 1].classList.remove("None");
+            else images[0].classList.remove("None");
+        }
 
-                left.addEventListener("click", () => {
-                    sliderLeft();
-                })
+        const images = document.getElementsByClassName("info-img-box");
+        for (let i = 1; i < images.length; i++) {
+            images[i].classList.add("None");
+        }
 
-                right.addEventListener("click", () => {
-                    sliderRight();
-                })
+        document.addEventListener('DOMContentLoaded', function() {
+            const left = document.querySelector(".info-arr-left");
+            const right = document.querySelector(".info-arr-right");
+            const button = document.querySelector(".buy-btn");
+            const detailsBtn = document.querySelector(".btn-details");
+            const detailsBox = document.querySelector(".product-details");
 
-                button.addEventListener("click", () => {
-                    const messageText = "Здравствуйте! Я хочу приобрести товар ${product.title}%0AАртикул: ${product.id}";
-                    window.open("https://t.me/hxxdrichXD?text=" + messageText);
-                })
+            left.addEventListener("click", () => { sliderLeft(); })
+            right.addEventListener("click", () => { sliderRight(); })
 
-                switch ("${product.productType}") {
-                    case "CPU":
-                        document.getElementById("socket").classList.remove("none-info");
-                        break;
+            button.addEventListener("click", () => {
+                const messageText = "Здравствуйте! Я хочу приобрести товар ${product.title}%0AАртикул: ${product.id}";
+                window.open("https://t.me/hxxdrichXD?text=" + messageText);
+            })
 
-                    case "MOTHERBOARD":
-                        document.getElementById("socket").classList.remove("none-info");
-                        document.getElementById("ddr").classList.remove("none-info");
-                        document.getElementById("gddr").classList.remove("none-info");
-                        document.getElementById("format").classList.remove("none-info");
-                        break;
-
-                    case "RAM":
-                        document.getElementById("ddr").classList.remove("none-info");
-                        break;
-
-                    case "GPU":
-                        document.getElementById("gddr").classList.remove("none-info");
-                        break;
-
-                    case "PSU":
-                        document.getElementById("format").classList.remove("none-info");
-                        break;
-
-                    case "CASE":
-                        document.getElementById("format").classList.remove("none-info");
-                        break;
+            // Показать/скрыть характеристики
+            detailsBtn.addEventListener("click", function() {
+                if (detailsBox.style.display === "none" || detailsBox.style.display === "") {
+                    detailsBox.style.display = "block";
+                    detailsBtn.textContent = "Скрыть";
+                } else {
+                    detailsBox.style.display = "none";
+                    detailsBtn.textContent = "Подробнее";
                 }
             });
-        </script>
-    </@t.template>
+
+            // Включаем нужные поля совместимости
+            switch ("${product.productType}") {
+                case "CPU":
+                    document.getElementById("socket").classList.remove("none-info");
+                    break;
+                case "MOTHERBOARD":
+                    document.getElementById("socket").classList.remove("none-info");
+                    document.getElementById("ddr").classList.remove("none-info");
+                    document.getElementById("gddr").classList.remove("none-info");
+                    document.getElementById("format").classList.remove("none-info");
+                    break;
+                case "RAM":
+                    document.getElementById("ddr").classList.remove("none-info");
+                    break;
+                case "GPU":
+                    document.getElementById("gddr").classList.remove("none-info");
+                    break;
+                case "PSU":
+                case "CASE":
+                    document.getElementById("format").classList.remove("none-info");
+                    break;
+            }
+
+            document.querySelectorAll('.btn-details').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    console.log('Клик по кнопке "Подробнее"');
+                    // Найти .product-details рядом с кнопкой
+                    const detailsBox = this.parentNode.querySelector('.product-details');
+                    if (detailsBox.style.display === "none" || detailsBox.style.display === "") {
+                        detailsBox.style.display = "block";
+                        btn.textContent = "Скрыть";
+                    } else {
+                        detailsBox.style.display = "none";
+                        btn.textContent = "Подробнее";
+                    }
+                });
+            });
+        });
+    </script>
+</@t.template>

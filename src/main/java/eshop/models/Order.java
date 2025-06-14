@@ -35,6 +35,11 @@ public class Order {
 
     private double totalPrice;
 
+    private String customerFullName;
+    private String customerPhone;
+    private String address;
+    private String postalCode;
+
     @Transient
     private String formattedDate;
 
@@ -46,3 +51,4 @@ public class Order {
         return "";
     }
 }
+

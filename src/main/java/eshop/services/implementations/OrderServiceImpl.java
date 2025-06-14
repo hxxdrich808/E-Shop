@@ -1,63 +1,58 @@
 package eshop.services.implementations;
 
-import eshop.models.CartItem;
-import eshop.models.Order;
-import eshop.models.OrderItem;
-import eshop.models.User;
+import eshop.models.*;
 import eshop.models.enums.OrderStatus;
-import eshop.repositories.CartItemRepository;
-import eshop.repositories.OrderItemRepository;
-import eshop.repositories.OrderRepository;
-import eshop.repositories.ProductRepository;
+import eshop.repositories.*;
 import eshop.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
-    private final CartItemRepository cartItemRepository;
-    private final ProductRepository productRepository;
+    private final CartRepository cartRepository;
 
     @Override
-    public Order createOrderFromCart(User user) {
-        List<CartItem> cartItems = cartItemRepository.findByCart(user.getCart());
-
-        if (cartItems.isEmpty()) {
+    public void createOrderFromCart(Cart cart, String fullName, String phone, String address, String postalCode) {
+        if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new IllegalStateException("Корзина пуста.");
         }
 
-        double totalPrice = cartItems.stream()
+        // Создаём заказ
+        Order order = new Order();
+        order.setUser(cart.getUser());
+        order.setDate(LocalDateTime.now());
+        order.setStatus(OrderStatus.CREATED); // или другой статус по-умолчанию
+        order.setTotalPrice(cart.getItems().stream()
                 .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
-                .sum();
+                .sum());
+        order.setCustomerFullName(fullName);
+        order.setCustomerPhone(phone);
+        order.setAddress(address);
+        order.setPostalCode(postalCode);
 
-        Order order = Order.builder()
-                .user(user)
-                .status(OrderStatus.CREATED)
-                .totalPrice(totalPrice)
-                .date(LocalDateTime.now())
-                .build();
+        // Копируем товары из корзины в заказ
+        List<OrderItem> orderItems = cart.getItems().stream().map(cartItem -> {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
+            orderItem.setProduct(cartItem.getProduct());
+            orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setPrice(cartItem.getProduct().getPrice());
+            return orderItem;
+        }).collect(Collectors.toList());
+        order.setItems(orderItems);
 
-        order = orderRepository.save(order);
+        // Сохраняем заказ
+        orderRepository.save(order);
 
-        for (CartItem cartItem : cartItems) {
-            OrderItem orderItem = OrderItem.builder()
-                    .order(order)
-                    .product(cartItem.getProduct())
-                    .quantity(cartItem.getQuantity())
-                    .price(cartItem.getProduct().getPrice())
-                    .build();
-            orderItemRepository.save(orderItem);
-        }
-
-        cartItemRepository.deleteAll(cartItems);
-
-        return order;
+        // Очищаем корзину пользователя
+        cart.getItems().clear();
+        cartRepository.save(cart);
     }
 }

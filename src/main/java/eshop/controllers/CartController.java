@@ -36,7 +36,15 @@ public class CartController {
         User user = userService.getUserByPrincipal(principal);
         Product product = productRepository.findById(productId).orElseThrow();
         cartService.addProductToCart(user, product);
-        return "redirect:/cart";
+        return "redirect:/";
+    }
+
+    @PostMapping("/addFromProduct/{productId}")
+    public String addToCartFromProduct(@PathVariable Long productId, Principal principal) {
+        User user = userService.getUserByPrincipal(principal);
+        Product product = productRepository.findById(productId).orElseThrow();
+        cartService.addProductToCart(user, product);
+        return "redirect:/Product/" + productId;
     }
 
     @PostMapping("/increment/{productId}")

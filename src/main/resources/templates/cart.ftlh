@@ -43,7 +43,29 @@
 
         <h3>Итого: ${totalPrice} ₽</h3>
 
-        <a href="/order/create" class="btn hover">Оформить заказ</a>
+        <form action="/order/create" method="post" style="max-width: 420px; margin-top: 28px;">
+            <input type="hidden" name="_csrf" value="${_csrf.token}">
+
+            <label>ФИО:<br>
+                <input type="text" name="customerFullName" required placeholder="Введите ФИО">
+            </label><br><br>
+
+            <label>Телефон:<br>
+                <input type="tel" name="customerPhone" required placeholder="8XXXXXXXXXX">
+            </label><br><br>
+
+            <label>Адрес доставки:<br>
+                <input type="text" name="address" required minlength="7"
+                       pattern=".{7,}" placeholder="Москва, ул. Ленина 13">
+                <small>Формат: Город, улица и номер дома (например, Москва, ул. Ленина 13)</small>
+            </label><br><br>
+
+            <label>Почтовый индекс:<br>
+                <input type="text" name="postalCode" required placeholder="101000">
+            </label><br><br>
+
+            <button type="submit" class="btn hover">Оформить заказ</button>
+        </form>
 
     <#else>
         <h3>Корзина пуста</h3>

@@ -1,6 +1,6 @@
 version: '3.7'
-services:
 
+services:
   postgres:
     container_name: eshop-postgres
     image: postgres:14
@@ -14,6 +14,24 @@ services:
       - "5432:5432"
     networks:
       - eshop-net
+
+  minio:
+    image: minio/minio:latest
+    container_name: versatility-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    command: server /data --console-address ":9001"
+    volumes:
+      - versatility-minio-data:/data
+    networks:
+      - eshop-net
+
+volumes:
+  versatility-minio-data:
 
 networks:
   eshop-net:
