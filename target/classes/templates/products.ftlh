@@ -65,7 +65,19 @@
             <!-- Карточки товаров -->
             <div class="card-columns" id="products-container">
                 <#list Products as product>
-                    <div class="product-card product-link-container" id="${product.id}" data-price="${product.price}">
+                <#-- Вычисляем средний рейтинг для каждого продукта -->
+                    <#assign avgRating = 0.0>
+                    <#if product.reviews?? && product.reviews?size gt 0>
+                        <#assign sum = 0>
+                        <#list product.reviews as r>
+                            <#assign sum = sum + r.rating>
+                        </#list>
+                        <#assign avgRating = sum / product.reviews?size>
+                    </#if>
+                    <div class="product-card product-link-container"
+                         id="${product.id}"
+                         data-price="${product.price}"
+                         data-rating="${avgRating}">
                         <span style="display: none" id="${product.id}title">${product.title}</span>
                         <a href="/Product/${product.id}" class="product-link">
                             <div class="product-image-box"
@@ -73,9 +85,16 @@
                             <div class="card-body">
                                 <h5 class="card-title">${product.title}</h5>
                                 <p class="card-text">${product.price} ₽</p>
-                                <p>Рейтинг: ${product.averageRating?string("0.0")}</p>
+                                <p>Рейтинг: ${avgRating?string("0.0")}</p>
                             </div>
                         </a>
+                        <!-- Кнопка добавить в корзину -->
+                        <form action="/cart/add/${product.id}" method="post" style="margin: 12px;">
+                            <input type="hidden" name="_csrf" value="${_csrf.token}">
+                            <button type="submit" class="add-to-cart-btn">
+                                🛒 В корзину
+                            </button>
+                        </form>
                     </div>
                 <#else>
                     <h1 style="text-align: center">Не найдено</h1>
@@ -103,27 +122,50 @@
                 }
             });
 
-            // Сортировка по цене
-            function sortProducts(byAsc) {
-                const container = document.getElementById("products-container");
-                const cards = Array.from(container.getElementsByClassName("product-card"));
-                cards.sort((a, b) => {
-                    const pa = parseFloat(a.getAttribute("data-price"));
-                    const pb = parseFloat(b.getAttribute("data-price"));
-                    return byAsc ? pa - pb : pb - pa;
-                });
-                cards.forEach(card => container.appendChild(card));
+            // ---- Toggle сортировка ----
+            const container = document.getElementById("products-container");
+            const originalOrder = Array.from(container.children);
+
+            // Функция сброса сортировки
+            function resetProductsOrder() {
+                originalOrder.forEach(card => container.appendChild(card));
             }
 
-            document.getElementById('sort-price-asc').onclick = function() { sortProducts(true); };
-            document.getElementById('sort-price-desc').onclick = function() { sortProducts(false); };
+            // Удалить active со всех кнопок
+            function clearActiveSort() {
+                document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+            }
+
+            // Toggle для каждой сортировки
+            let activeSort = null;
+
+            function toggleSort(type) {
+                if (activeSort === type) {
+                    // Сбросить сортировку
+                    resetProductsOrder();
+                    clearActiveSort();
+                    activeSort = null;
+                } else {
+                    let cards = Array.from(container.getElementsByClassName("product-card"));
+                    if (type === 'price-asc') {
+                        cards.sort((a, b) => parseFloat(a.getAttribute("data-price")) - parseFloat(b.getAttribute("data-price")));
+                    } else if (type === 'price-desc') {
+                        cards.sort((a, b) => parseFloat(b.getAttribute("data-price")) - parseFloat(a.getAttribute("data-price")));
+                    } else if (type === 'rating-desc') {
+                        cards.sort((a, b) => parseFloat(b.getAttribute("data-rating")) - parseFloat(a.getAttribute("data-rating")));
+                    }
+                    cards.forEach(card => container.appendChild(card));
+                    clearActiveSort();
+                    document.getElementById('sort-' + type).classList.add('active');
+                    activeSort = type;
+                }
+            }
+
+            // Привязываем кнопки
+            document.getElementById('sort-price-asc').onclick = function() { toggleSort('price-asc'); };
+            document.getElementById('sort-price-desc').onclick = function() { toggleSort('price-desc'); };
+            document.getElementById('sort-rating-desc').onclick = function() { toggleSort('rating-desc'); };
+
         });
-
-        // Сортировка по рейтингу
-        document.getElementById('sort-rating-desc').onclick = function() {
-            window.location.href = '/products/sortByRating';
-        };
-
     </script>
-
 </@t.template>

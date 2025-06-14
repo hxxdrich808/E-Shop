@@ -1093,4 +1093,40 @@ body {
     color: #0075FF;
     margin-left: auto;
 }
+.sort-btn.active {
+    background: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+.cart-btn .btn {
+    background: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    padding: 4px 14px;
+    margin: 2px 4px;
+    border: 1px solid #007bff;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+}
+.cart-btn .btn:hover {
+    background: #0056b3;
+    color: #fff;
+    text-decoration: none;
+}
+.add-to-cart-btn {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 7px 16px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.18s;
+    font-weight: 500;
+}
+.add-to-cart-btn:hover {
+    background: #0056b3;
+}
 

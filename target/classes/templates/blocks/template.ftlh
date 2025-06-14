@@ -14,8 +14,15 @@
                 <span class="navbar-brand">E-Shop</span>
             </a>
             <div class="navbar-right">
-                <div class="pc-builder hover">
+                <!-- Кнопка конструктора ПК -->
+                <div class="pc-builder hover" style="display: inline-block;">
                     <a href="/pcbuilder" class="btn btn-primary">Конструктор ПК</a>
+                </div>
+                <!-- Кнопка корзины -->
+                <div class="cart-btn hover" style="display: inline-block; margin-right: 10px;">
+                    <a href="/cart" class="btn btn-primary">
+                        🛒 Корзина
+                    </a>
                 </div>
                 <#if user.email??>
                     <div class="avatar-icon hover">
