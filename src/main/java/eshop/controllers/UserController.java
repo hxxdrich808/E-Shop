@@ -1,8 +1,8 @@
 package eshop.controllers;
 
 
-import eshop.models.enums.ProductType;
 import eshop.models.User;
+import eshop.models.enums.ProductType;
 import eshop.services.implementations.ProductServiceImpl;
 import eshop.services.implementations.UserServiceImpl;
 import lombok.RequiredArgsConstructor;

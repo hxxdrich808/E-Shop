@@ -62,8 +62,8 @@ public class ProductController {
 
 
     @PostMapping("/Product/create")
-    public String createProduct(@RequestParam("file1") MultipartFile file1, @RequestParam("file2") MultipartFile file2, @RequestParam("file3") MultipartFile file3, Product product, ProductCompatibility productCompatibility, ProductType productType) throws IOException {
-        productService.saveProduct(productType, product, productCompatibility, file1, file2, file3);
+    public String createProduct(@RequestParam("files") List<MultipartFile> files, Product product, ProductCompatibility productCompatibility, ProductType productType) throws IOException {
+        productService.saveProduct(productType, product, productCompatibility, files);
         return "redirect:/";
     }
 

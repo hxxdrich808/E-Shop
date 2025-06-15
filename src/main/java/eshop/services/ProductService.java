@@ -6,13 +6,14 @@ import eshop.models.User;
 import eshop.models.enums.ProductType;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
 public interface ProductService {
     List<Product> listProducts(String title);
 
-    void saveProduct(ProductType productType, Product product, ProductCompatibility productCompatibility, MultipartFile file1, MultipartFile file2, MultipartFile file3);
+    void saveProduct(ProductType productType, Product product, ProductCompatibility productCompatibility, List<MultipartFile> images) throws IOException;
 
     User getUserByPrincipal(Principal principal);
 

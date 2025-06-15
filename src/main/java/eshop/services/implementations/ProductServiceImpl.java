@@ -1,14 +1,16 @@
 package eshop.services.implementations;
 
-import eshop.exceptions.ConvertationException;
+import eshop.mappers.S3BucketObjectMapper;
 import eshop.models.*;
 import eshop.models.enums.ProductType;
+import eshop.repositories.ImageRepository;
 import eshop.repositories.ProductCompatibilityRepository;
 import eshop.repositories.ProductRepository;
 import eshop.repositories.UserRepository;
 import eshop.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,15 +18,23 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Objects;
+
+import static eshop.utils.FileUtils.cleanFileName;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ProductServiceImpl implements ProductService {
 
+    @Value("${cloud.aws.s3.bucket-name}")
+    private String bucketName;
+
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final ProductCompatibilityRepository productCompatibilityRepository;
+    private final ImageRepository imageRepository;
+    private final S3ServiceImpl s3Service;
 
     @Override
     public List<Product> listProducts(String title) {
@@ -34,28 +44,22 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void saveProduct(ProductType productType, Product product, ProductCompatibility productCompatibility, MultipartFile file1, MultipartFile file2, MultipartFile file3) {
-        Image image1;
-        Image image2;
-        Image image3;
-        product.setProductType(productType);
-        if (file1.getSize() != 0) {
-            image1 = toImageEntity(file1);
-            image1.setPreviewImage(true);
-            product.addImageToProduct(image1);
+    public void saveProduct(ProductType productType, Product product, ProductCompatibility productCompatibility, List<MultipartFile> images) throws IOException {
+        Product savedProduct = productRepository.save(product);
+        if (images != null && !images.isEmpty()) {
+            for (int i = 0; i < images.size(); i++) {
+                MultipartFile file = images.get(i);
+                Image image = uploadImageToS3(file, savedProduct);
+                image = imageRepository.save(image);
+                savedProduct.addImageToProduct(image);
+
+                if (i == 0) {
+                    savedProduct.setPreviewImage(image);
+                }
+            }
+
+            productRepository.save(savedProduct);
         }
-        if (file2.getSize() != 0) {
-            image2 = toImageEntity(file2);
-            product.addImageToProduct(image2);
-        }
-        if (file3.getSize() != 0) {
-            image3 = toImageEntity(file3);
-            product.addImageToProduct(image3);
-        }
-        log.info("Saving new Product. Title: {}", product.getTitle());
-        Product productFromDB = productRepository.save(product);
-        productFromDB.setPreviewImageId(productFromDB.getImages().get(0).getId());
-        productRepository.save(product);
         switch (productType) {
             case CPU, MOTHERBOARD, CASE, GPU, RAM, DRIVE, PSU -> {
                 productCompatibility.setProduct(product);
@@ -86,21 +90,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductCompatibility getProductCompatibilityByProductId(Long productId) {
         return productCompatibilityRepository.findByProductId(productId);
-    }
-
-    private Image toImageEntity(MultipartFile file)  {
-        Image image = new Image();
-        image.setName(file.getName());
-        image.setFileName(file.getOriginalFilename());
-        image.setContentType(file.getContentType());
-        image.setSize(file.getSize());
-        try {
-            image.setBytes(file.getBytes());
-        } catch (IOException e) {
-            log.error("Error while converting file to bytes", e);
-            throw new ConvertationException(e.getMessage());
-        }
-        return image;
     }
 
     @Override
@@ -140,5 +129,24 @@ public class ProductServiceImpl implements ProductService {
         });
 
         return products;
+    }
+
+    private Image uploadImageToS3(MultipartFile file, Product product) throws IOException {
+        String clearFileName = cleanFileName(Objects.requireNonNull(file.getOriginalFilename()));
+        String key = String.format("products/%d/%s", product.getId(), clearFileName);
+
+        s3Service.putObject(bucketName, new S3BucketObjectMapper(key, file.getInputStream()));
+
+        Image image = new Image();
+        image.setName(file.getName());
+        image.setFileName(clearFileName);
+        image.setContentType(file.getContentType());
+        image.setSize(file.getSize());
+        image.setS3Key(key);
+        String url = String.format("http://localhost:9000/%s/%s", bucketName, key);
+        image.setUrl(url);
+        image.setProduct(product);
+
+        return image;
     }
 }

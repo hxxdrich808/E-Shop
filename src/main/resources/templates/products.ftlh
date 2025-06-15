@@ -81,7 +81,7 @@
                         <span style="display: none" id="${product.id}title">${product.title}</span>
                         <a href="/Product/${product.id}" class="product-link">
                             <div class="product-image-box"
-                                 style="background-image: url('/images/${product.previewImageId}')"></div>
+                                 style="background-image: url('/images/${product.previewImage.id?c}')"></div>
                             <div class="card-body">
                                 <h5 class="card-title">${product.title}</h5>
                                 <p class="card-text">${product.price} ₽</p>

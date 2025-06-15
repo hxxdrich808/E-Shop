@@ -84,25 +84,14 @@
                                 <input type="text" class="form-control" id="format" name="format" placeholder="Формат">
                             </div>
                         </div>
-                        <div class="form-group-file">
+                        <div class="form-group mb-4">
                             <div class="custom-file">
-                                <input class="input-file" required type="file" name="file1" id="file1">
-                                <label class="custom-file-label file1" for="file1">Первая фотография к товару</label>
-                                <img class="input-icon-img" src="../static/images/file.svg">
-                            </div>
-                        </div>
-                        <div class="form-group-file">
-                            <div class="custom-file">
-                                <input class="input-file" type="file" name="file2" id="file2">
-                                <label class="custom-file-label file2" for="file2">Вторая фотография к товару</label>
-                                <img class="input-icon-img" src="../static/images/file.svg">
-                            </div>
-                        </div>
-                        <div class="form-group-file">
-                            <div class="custom-file">
-                                <input class="input-file" type="file" name="file3" id="file3">
-                                <label class="custom-file-label file3" for="file3">Третья фотография к товару</label>
-                                <img class="input-icon-img" src="../static/images/file.svg">
+                                <label class="custom-file-label" for="files">Фотографии товара</label>
+                                <div class="custom-input-box"
+                                     style="width: 100%; background-color: white; border: solid 1px #dee2e6; height: 36px; margin-bottom: 10px; border-radius: 5px; display: flex; position: relative; align-items: center">
+                                    <span class="files-count1" style="position: absolute; left: 10px; font-size: 14px">Выбрать файл</span>
+                                    <input class="files-input1" required type="file" style="opacity: 0; width: 100%; height: 100%" name="files" id="files" multiple>
+                                </div>
                             </div>
                         </div>
                         <input type="hidden" name="_csrf" value="${_csrf.token}"/>

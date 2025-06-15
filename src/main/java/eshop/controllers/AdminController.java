@@ -1,12 +1,11 @@
 package eshop.controllers;
 
 import eshop.models.Order;
+import eshop.models.User;
 import eshop.models.enums.OrderStatus;
 import eshop.models.enums.Role;
-import eshop.models.User;
 import eshop.repositories.OrderRepository;
 import eshop.repositories.UserRepository;
-import eshop.services.implementations.OrderServiceImpl;
 import eshop.services.implementations.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;

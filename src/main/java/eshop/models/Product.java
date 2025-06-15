@@ -40,9 +40,13 @@ public class Product {
     private ProductType productType;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "product")
-    @JsonIgnore
+//    @JsonIgnore
     private List<Image> images = new ArrayList<>();
-    private Long previewImageId;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "preview_image_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_product_preview_image"))
+    private Image previewImage;
+
     private LocalDateTime dateOfCreated;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -51,19 +55,6 @@ public class Product {
     @PrePersist
     private void init() {
         dateOfCreated = LocalDateTime.now();
-    }
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", manufacturer='" + manufacturer + '\'' +
-                ", description='" + description + '\'' +
-                ", price=" + price +
-                ", productType=" + productType +
-                ", dateOfCreated=" + dateOfCreated +
-                '}';
     }
 
     public void addImageToProduct(Image image) {
