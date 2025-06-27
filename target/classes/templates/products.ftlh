@@ -2,103 +2,104 @@
 <@t.template user>
     <h4 class="products-sub">Магазины по всей России</h4>
 
-    <div style="display: flex; align-items: flex-start; width: 100%;">
+    <div class="products-container">
+        <form class="search-form input-box" style="margin-top: 24px;">
+            <div class="products-input">
+                <input type="text" name="searchWord" placeholder="Поиск по товарам"
+                       <#if searchWord??>value="${searchWord}"</#if> class="products-search form-control"
+                       id="searchWord">
+            </div>
+            <button type="submit" class="search-products hover">
+                <img src="../static/images/loop.svg" alt="Поиск">
+            </button>
+        </form>
 
-        <!-- Левая колонка: фильтры -->
-        <div class="filters-panel">
-            <h3>Фильтры</h3>
-            <form method="get" class="filter-form">
+        <div class="products-row">
+            <div class="filters-panel">
+                <h3>Фильтры</h3>
+                <form method="get" class="filter-form">
 
-                <label for="type">Тип товара:</label>
-                <select id="type" name="type">
-                    <option value="">Все типы</option>
-                    <#list ProductType as pt>
-                        <option value="${pt}" <#if type?? && pt == type>selected</#if>>${pt}</option>
-                    </#list>
-                </select>
+                    <label for="type" class="filter-name">Тип товара:</label>
+                    <select id="type" name="type">
+                        <option value="">Все типы</option>
+                        <#list ProductType as pt>
+                            <option value="${pt}" <#if type?? && pt == type>selected</#if>>${pt}</option>
+                        </#list>
+                    </select>
 
-                <label for="manufacturer">Производитель:</label>
-                <select id="manufacturer" name="manufacturer">
-                    <option value="">Все производители</option>
-                    <#list Manufacturers as mfr>
-                        <option value="${mfr}" <#if manufacturer?? && manufacturer == mfr>selected</#if>>${mfr}</option>
-                    </#list>
-                </select>
+                    <label for="manufacturer">Производитель:</label>
+                    <select id="manufacturer" name="manufacturer">
+                        <option value="">Все производители</option>
+                        <#list Manufacturers as mfr>
+                            <option value="${mfr}" <#if manufacturer?? && manufacturer == mfr>selected</#if>>${mfr}</option>
+                        </#list>
+                    </select>
 
-                <label>
-                    <input type="checkbox" name="inStock"
-                           <#if inStock?? && inStock == "on">checked</#if>
-                    > Только в наличии
-                </label>
+                    <label>
+                        <input class="checkbox" type="checkbox" name="inStock"
+                               <#if inStock?? && inStock == "on">checked</#if>
+                        >
+                        <span>Только в наличии</span>
+                    </label>
 
-                <label>Цена:</label>
-                <input type="number" name="minPrice" placeholder="Мин. цена" value="${minPrice!''}">
-                <input type="number" name="maxPrice" placeholder="Макс. цена" value="${maxPrice!''}">
+                    <label>Цена:</label>
+                    <input type="number" name="minPrice" placeholder="Мин. цена" min="0" oninput="this.value = this.value < 0 ? 0 : this.value" value="${minPrice!''}">
+                    <input type="number" name="maxPrice" placeholder="Макс. цена" min="0" oninput="this.value = this.value < 0 ? 0 : this.value" value="${maxPrice!''}">
 
-                <button type="submit">Фильтровать</button>
-                <a href="/" class="reset-filters">Сбросить фильтры</a>
-            </form>
-        </div>
-
-        <!-- Правая часть: поиск, сортировка и карточки товаров -->
-        <div style="flex:1; display: flex; flex-direction: column;">
-            <!-- Поиск -->
-            <form class="search-form input-box" style="margin-top: 24px;">
-                <div class="products-input">
-                    <input type="text" name="searchWord" placeholder="Поиск по товарам"
-                           <#if searchWord??>value="${searchWord}"</#if> class="products-search form-control"
-                           id="searchWord">
-                </div>
-                <button type="submit" class="search-products hover">
-                    <img src="../static/images/loop.svg" alt="Поиск">
-                </button>
-            </form>
-
-            <!-- Сортировка -->
-            <div class="sort-panel">
-                <span>Сортировать:</span>
-                <button type="button" class="sort-btn" id="sort-price-asc">По цене ↑</button>
-                <button type="button" class="sort-btn" id="sort-price-desc">По цене ↓</button>
-                <button type="button" class="sort-btn" id="sort-rating-desc">По рейтингу</button>
+                    <button type="submit">Фильтровать</button>
+                    <a href="/" class="reset-filters">Сбросить фильтры</a>
+                </form>
             </div>
 
-            <!-- Карточки товаров -->
-            <div class="card-columns" id="products-container">
-                <#list Products as product>
-                <#-- Вычисляем средний рейтинг для каждого продукта -->
-                    <#assign avgRating = 0.0>
-                    <#if product.reviews?? && product.reviews?size gt 0>
-                        <#assign sum = 0>
-                        <#list product.reviews as r>
-                            <#assign sum = sum + r.rating>
-                        </#list>
-                        <#assign avgRating = sum / product.reviews?size>
-                    </#if>
-                    <div class="product-card product-link-container"
-                         id="${product.id}"
-                         data-price="${product.price}"
-                         data-rating="${avgRating}">
-                        <span style="display: none" id="${product.id}title">${product.title}</span>
-                        <a href="/Product/${product.id}" class="product-link">
-                            <div class="product-image-box"
-                                 style="background-image: url('/images/${product.previewImage.id?c}')"></div>
-                            <div class="card-body">
-                                <h5 class="card-title">${product.title}</h5>
-                                <p class="card-text">${product.price} ₽</p>
-                                <p>Рейтинг: ${avgRating?string("0.0")}</p>
+            <div style="flex:1; display: flex; flex-direction: column;">
+                <!-- Сортировка -->
+                <div class="sort-panel">
+                    <span>Сортировать:</span>
+                    <button type="button" class="sort-btn" id="sort-price-asc">По цене ↑</button>
+                    <button type="button" class="sort-btn" id="sort-price-desc">По цене ↓</button>
+                    <button type="button" class="sort-btn" id="sort-rating-desc">По рейтингу</button>
+                </div>
+
+                <!-- Карточки товаров -->
+                <div class="card-columns" id="products-container">
+                    <#list Products as product>
+                        <#assign avgRating = 0.0>
+                        <#if product.reviews?? && product.reviews?size gt 0>
+                            <#assign sum = 0>
+                            <#list product.reviews as r>
+                                <#assign sum = sum + r.rating>
+                            </#list>
+                            <#assign avgRating = sum / product.reviews?size>
+                        </#if>
+                        <div class="product-card product-link-container"
+                             id="${product.id}"
+                             data-price="${product.price}"
+                             data-rating="${avgRating}">
+                            <div>
+                                <span style="display: none" id="${product.id}title">${product.title}</span>
+                                <a href="/Product/${product.id}" class="product-link">
+                                    <div class="product-image-box"
+                                         style="background-image: url('/images/${product.previewImage.id?c}')"></div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">${product.title}</h5>
+                                        <p class="card-text">${product.price} ₽</p>
+                                        <p>Рейтинг: ${avgRating?string("0.0")}</p>
+                                    </div>
+                                </a>
                             </div>
-                        </a>
-                        <!-- Кнопка добавить в корзину -->
-                        <form action="/cart/add/${product.id}" method="post" style="margin: 12px;">
-                            <input type="hidden" name="_csrf" value="${_csrf.token}">
-                            <button type="submit" class="add-to-cart-btn">
-                                🛒 В корзину
-                            </button>
-                        </form>
-                    </div>
-                <#else>
-                    <h1 style="text-align: center">Не найдено</h1>
-                </#list>
+                            <!-- Кнопка добавить в корзину -->
+                            <form action="/cart/add/${product.id}" method="post">
+                                <input type="hidden" name="_csrf" value="${_csrf.token}">
+                                <button type="submit" class="add-to-cart-btn">
+                                    <img src="../../static/images/cart.png" />
+                                    <span>В корзину</span>
+                                </button>
+                            </form>
+                        </div>
+                    <#else>
+                        <h1 style="text-align: center">Не найдено</h1>
+                    </#list>
+                </div>
             </div>
         </div>
     </div>

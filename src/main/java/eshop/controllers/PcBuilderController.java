@@ -1,9 +1,11 @@
 package eshop.controllers;
 
+import eshop.dto.ProductDTO;
 import eshop.models.Build;
 import eshop.models.Product;
 import eshop.models.enums.ProductType;
 import eshop.repositories.BuildRepository;
+import eshop.repositories.ProductRepository;
 import eshop.services.implementations.PcBuilderServiceImpl;
 import eshop.services.implementations.ProductServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class PcBuilderController {
     private final ProductServiceImpl productService;
     private final PcBuilderServiceImpl pcBuilderService;
     private final BuildRepository buildRepository;
+
     Build build;
 
     @GetMapping("pcbuilder")
@@ -41,10 +44,14 @@ public class PcBuilderController {
 
     @GetMapping("/pcbuilder/compatibleProduct")
     @ResponseBody
-    public List<Product> getCompatibleProducts(@RequestParam String productType) {
+    public List<ProductDTO> getCompatibleProducts(@RequestParam String productType) {
         ProductType type = ProductType.valueOf(productType.toUpperCase());
-        return pcBuilderService.getCompatibleProduct(type);
+        return pcBuilderService.getCompatibleProduct(type)
+                .stream()
+                .map(ProductDTO::new)
+                .toList();
     }
+
 
     @GetMapping("/pcbuilder/addToBuild")
     @ResponseBody

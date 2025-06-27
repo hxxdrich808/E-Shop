@@ -15,13 +15,14 @@
             </a>
             <div class="navbar-right">
                 <!-- Кнопка конструктора ПК -->
-                <div class="pc-builder hover" style="display: inline-block;">
+                <div class="pc-builder hover">
                     <a href="/pcbuilder" class="btn btn-primary">Конструктор ПК</a>
                 </div>
                 <!-- Кнопка корзины -->
-                <div class="cart-btn hover" style="display: inline-block; margin-right: 10px;">
+                <div class="cart-btn hover">
                     <a href="/cart" class="btn btn-primary">
-                        🛒 Корзина
+                        <img src="../../static/images/cart.png" />
+                        <span>Корзина</span>
                     </a>
                 </div>
                 <#if user.email??>

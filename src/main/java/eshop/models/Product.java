@@ -3,44 +3,46 @@ package eshop.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import eshop.models.enums.ProductType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Entity
 @Table(name = "Products")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@AllArgsConstructor
+@EqualsAndHashCode(exclude = {"images", "previewImage", "reviews"})
+@ToString(exclude = {"images", "previewImage", "reviews"})
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Long id;
+
     @Column(name = "title")
     private String title;
+
     @Column(name = "manufacturer")
     private String manufacturer;
+
     @Column(name = "amount", columnDefinition = "int")
     private int amount;
+
     @Column(name = "description", columnDefinition = "text")
     private String description;
+
     @Column(name = "price")
     private int price;
+
     @Column(name = "product_type")
     @Enumerated(EnumType.STRING)
     private ProductType productType;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "product")
-//    @JsonIgnore
     private List<Image> images = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)

@@ -3,71 +3,116 @@
     <h1>Корзина</h1>
 
     <#if cart.items?size gt 0>
-        <table>
+        <table class="cart-table">
             <thead>
             <tr>
-                <th>Товар</th>
-                <th>Цена</th>
-                <th>Количество</th>
-                <th>Сумма</th>
-                <th>Действия</th>
+                <th class="cart-th">Товар</th>
+                <th class="cart-th">Цена</th>
+<#--                <th class="cart-th">Количество</th>-->
+                <th class="cart-th">Сумма</th>
+                <th class="cart-th">Действия</th>
             </tr>
             </thead>
             <tbody>
             <#list cart.items as item>
-                <tr>
-                    <td>${item.product.title}</td>
-                    <td>${item.product.price} ₽</td>
-                    <td>${item.quantity}</td>
-                    <td>${item.product.price * item.quantity} ₽</td>
-                    <td>
-                        <form action="/cart/increment/${item.product.id}" method="post" style="display:inline;">
-                            <input type="hidden" name="_csrf" value="${_csrf.token}">
-                            <button type="submit">+</button>
-                        </form>
+                <tr class="cart-row">
+                    <td class="cart-td">${item.product.title}</td>
+                    <td class="cart-td">${item.product.price} ₽</td>
+<#--                    <td class="cart-td">${item.quantity}</td>-->
+                    <td class="cart-td">${item.product.price * item.quantity} ₽</td>
+                    <td class="cart-td cart-actions">
+                        <div class="cart-actions-flex">
+                            <form action="/cart/increment/${item.product.id}" method="post">
+                                <input type="hidden" name="_csrf" value="${_csrf.token}">
+                                <button type="submit" class="cart-btn-count plus">+</button>
+                            </form>
 
-                        <form action="/cart/decrement/${item.product.id}" method="post" style="display:inline;">
-                            <input type="hidden" name="_csrf" value="${_csrf.token}">
-                            <button type="submit">-</button>
-                        </form>
+                            <span>${item.quantity}</span>
 
-                        <form action="/cart/remove/${item.product.id}" method="post" style="display:inline;">
-                            <input type="hidden" name="_csrf" value="${_csrf.token}">
-                            <button type="submit">Удалить</button>
-                        </form>
+                            <form action="/cart/decrement/${item.product.id}" method="post">
+                                <input type="hidden" name="_csrf" value="${_csrf.token}">
+                                <button type="submit" class="cart-btn-count minus">-</button>
+                            </form>
+
+                            <form action="/cart/remove/${item.product.id}" method="post">
+                                <input type="hidden" name="_csrf" value="${_csrf.token}">
+                                <button type="submit" class="cart-btn-count remove">Удалить</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             </#list>
             </tbody>
         </table>
 
+    <#--        <table>-->
+<#--            <thead>-->
+<#--            <tr>-->
+<#--                <th>Товар</th>-->
+<#--                <th>Цена</th>-->
+<#--                <th>Количество</th>-->
+<#--                <th>Сумма</th>-->
+<#--                <th>Действия</th>-->
+<#--            </tr>-->
+<#--            </thead>-->
+<#--            <tbody>-->
+<#--            <#list cart.items as item>-->
+<#--                <tr>-->
+<#--                    <td>${item.product.title}</td>-->
+<#--                    <td>${item.product.price} ₽</td>-->
+<#--                    <td>${item.quantity}</td>-->
+<#--                    <td>${item.product.price * item.quantity} ₽</td>-->
+<#--                    <td>-->
+<#--                        <form action="/cart/increment/${item.product.id}" method="post" style="display:inline;">-->
+<#--                            <input type="hidden" name="_csrf" value="${_csrf.token}">-->
+<#--                            <button type="submit">+</button>-->
+<#--                        </form>-->
+
+<#--                        <form action="/cart/decrement/${item.product.id}" method="post" style="display:inline;">-->
+<#--                            <input type="hidden" name="_csrf" value="${_csrf.token}">-->
+<#--                            <button type="submit">-</button>-->
+<#--                        </form>-->
+
+<#--                        <form action="/cart/remove/${item.product.id}" method="post" style="display:inline;">-->
+<#--                            <input type="hidden" name="_csrf" value="${_csrf.token}">-->
+<#--                            <button type="submit">Удалить</button>-->
+<#--                        </form>-->
+<#--                    </td>-->
+<#--                </tr>-->
+<#--            </#list>-->
+<#--            </tbody>-->
+<#--        </table>-->
+
         <h3>Итого: ${totalPrice} ₽</h3>
 
-        <form action="/order/create" method="post" style="max-width: 420px; margin-top: 28px;">
+        <form class="order-box" action="/order/create" method="post">
             <input type="hidden" name="_csrf" value="${_csrf.token}">
 
-            <label>ФИО:<br>
-                <input type="text" name="customerFullName" required placeholder="Введите ФИО">
-            </label><br><br>
+            <label class="order-input-label">ФИО:<br>
+                <input class="order-input" type="text" name="customerFullName" required placeholder="Введите ФИО">
+            </label>
 
-            <label>Телефон:<br>
-                <input type="tel" name="customerPhone" required placeholder="8XXXXXXXXXX">
-            </label><br><br>
+            <label class="order-input-label">Телефон:<br>
+                <input class="order-input" type="tel" name="customerPhone" required placeholder="8XXXXXXXXXX">
+            </label>
 
-            <label>Адрес доставки:<br>
-                <input type="text" name="address" required minlength="7"
+            <label class="order-input-label">Адрес доставки:<br>
+                <input class="order-input" type="text" name="address" required minlength="7"
                        pattern=".{7,}" placeholder="Москва, ул. Ленина 13">
                 <small>Формат: Город, улица и номер дома (например, Москва, ул. Ленина 13)</small>
-            </label><br><br>
+            </label>
 
-            <label>Почтовый индекс:<br>
-                <input type="text" name="postalCode" required placeholder="101000">
-            </label><br><br>
+            <label class="order-input-label">Почтовый индекс:<br>
+                <input class="order-input" type="text" name="postalCode" required placeholder="101000">
+            </label>
 
-            <button type="submit" class="btn hover">Оформить заказ</button>
+            <button type="submit" class="btn order-btn hover">Оформить заказ</button>
         </form>
 
     <#else>
-        <h3>Корзина пуста</h3>
+        <img class="empty-cart-img" src="../static/images/sad.png" />
+        <h3 class="empty-cart-sub">Ваша корзина пуста</h3>
+        <p class="empty-cart-par">Перейдите в наш каталог и выберите товары!</p>
+        <a href="/" class="cart-products-btn">Перейти в каталог</a>
     </#if>
 </@t.template>

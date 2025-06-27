@@ -24,7 +24,7 @@ class UserControllerTest {
     private MockMvc mockMvc;
     @Test
     void loginAndLogout_UserLoggedIn_LogoutSuccess() throws Exception {
-        mockMvc.perform(formLogin("/login").user("hxxdrich@mail.ru").password("invotink1love"))
+        mockMvc.perform(formLogin("/login").user("111@mail.ru").password("111"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"))
                 .andExpect(authenticated());
@@ -45,7 +45,7 @@ class UserControllerTest {
 
     @Test
     void badLogin() throws Exception {
-        mockMvc.perform(formLogin("/login").user("hxxdrich@mail.ru").password("leeeeeerukiebal"))
+        mockMvc.perform(formLogin("/login").user("hxxdrich@mail.ru").password("111"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login?error"));
     }

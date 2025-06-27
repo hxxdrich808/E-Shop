@@ -1,10 +1,10 @@
 <#import "blocks/template.ftlh" as t>
 <@t.template user>
     <h1 class="profile-sub">Личный кабинет</h1>
-    <div class="profile-row">
-        <div class="profile-info">
+    <div class="profile-row<#if !user.isAdmin()> user</#if>">
+        <div class="profile-info<#if !user.isAdmin()> user</#if>">
             <div class="profile-info-row">
-                <div class="profile-icon hover">
+                <div class="hover profile-icon<#if !user.isAdmin()> user</#if>">
                     <span class="profile-letter">${user.name?substring(0, 1)}</span>
                 </div>
                 <h2 class="profile-name">${user.name}</h2>
@@ -15,10 +15,16 @@
             <div class="profile-contacts">
                 <span>Номер телефона:</span><b class="profile-phone">${user.phoneNumber}</b>
             </div>
+            <div class="profile-orders hover">
+                <a
+                        href="/orders/my">
+                    Мои заказы
+                </a>
+            </div>
             <#if user.isAdmin()>
                 <div class="profile-admin hover">
                     <a
-                       href="/admin">
+                            href="/admin">
                         Панель администратора
                     </a>
                 </div>
@@ -87,10 +93,9 @@
                         <div class="form-group mb-4">
                             <div class="custom-file">
                                 <label class="custom-file-label" for="files">Фотографии товара</label>
-                                <div class="custom-input-box"
-                                     style="width: 100%; background-color: white; border: solid 1px #dee2e6; height: 36px; margin-bottom: 10px; border-radius: 5px; display: flex; position: relative; align-items: center">
-                                    <span class="files-count1" style="position: absolute; left: 10px; font-size: 14px">Выбрать файл</span>
-                                    <input class="files-input1" required type="file" style="opacity: 0; width: 100%; height: 100%" name="files" id="files" multiple>
+                                <div class="custom-input-box">
+                                    <span class="files-count1">Выбрать файл</span>
+                                    <input class="files-input1" required type="file" name="files" id="files" multiple>
                                 </div>
                             </div>
                         </div>
@@ -106,7 +111,7 @@
             console.log('Функция toggleCompatibilityFields вызвана');
             const compatibilityFields = document.getElementById('compatibilityFields');
             const productType = document.getElementById('productType').value.trim().toUpperCase();
-            const compatibleTypes = ['CPU', 'MOTHERBOARD', 'CASE', 'GPU', 'RAM', 'DRIVE', 'PSU'];
+            const compatibleTypes = ['CPU', 'MOTHERBOARD', 'CASE', 'GPU', 'RAM', 'DRIVE', 'PSU', 'COOLER'];
 
             console.log('Выбранный тип продукта:', productType);
             if (compatibleTypes.includes(productType)) {
@@ -120,8 +125,15 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const productTypeElement = document.getElementById('productType');
+            const input = document.querySelector(".files-input1");
+            const label = document.querySelector(".files-count1");
             productTypeElement.addEventListener('change', toggleCompatibilityFields);
             toggleCompatibilityFields();
+
+            input.addEventListener("change", () => {
+                const count = input.files.length;
+                label.textContent = "Выбрано файлов:" + count;
+            })
 
             const files = document.getElementsByClassName("input-file")
             for (let i of files) {

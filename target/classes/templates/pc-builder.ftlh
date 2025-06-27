@@ -211,7 +211,7 @@
     </head>
     <body>
     <h1 class="builder-sub">Конструктор ПК</h1>
-    <form class="pc-builder-form" id="pc-builder-form" action="/pcbuilder/saveBuild" method="GET">
+    <form class="pc-builder-form" id="pc-builder-form" action="/pcbuilder/saveBuild" method="GET" accept-charset="UTF-8">
         <div class="builder-item" id="selectCPU">
             <label class="labelCPU" for="cpu">Процессор</label>
             <img class="arrCPU" src="../static/images/arrow2.svg">

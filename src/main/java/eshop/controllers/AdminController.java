@@ -74,16 +74,13 @@ public class AdminController {
             @RequestParam("status") String status,
             @RequestParam(value = "userId", required = false) Long userId // Для редиректа обратно
     ) {
-        // Найти заказ
         Order order = orderRepository.findById(orderId).orElse(null);
         if (order == null) {
             return "redirect:/admin";
         }
-        // Обновить статус
         order.setStatus(OrderStatus.valueOf(status));
         orderRepository.save(order);
 
-        // Редирект обратно на страницу заказов пользователя
         if (userId != null) {
             return "redirect:/orders/user/" + userId;
         } else {

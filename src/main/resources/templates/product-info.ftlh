@@ -10,46 +10,21 @@
             <img class="info-arr-right" src="../static/images/arrow.svg">
         </div>
         <div class="info-box">
-            <div class="info-item">
-                <b>Название товара: </b>${product.title}
+            <div class="info-item product-item-name">
+                ${product.title}
             </div>
-            <div class="info-item">
-                <b>Цена товара: </b>${product.price} ₽
+            <div class="info-item product-item-amount">
+                Наличие: ${product.amount}
             </div>
-            <div class="info-item">
-                <b>Наличие: </b>${product.amount}
+            <div class="info-item product-item-price">
+                ${product.price} ₽
             </div>
 
-            <!-- Кнопка Подробнее -->
-            <button class="btn btn-details hover" type="button" style="margin:10px 0;">
-                Подробнее
-            </button>
-            <!-- Скрытый блок характеристик -->
-            <div class="product-details" style="display:none; margin-bottom:14px;">
-                <div class="info-item">
-                    <b>Производитель: </b>${product.manufacturer}
-                </div>
-                <div class="info-item">
-                    <b>Описание товара: </b>${product.description}
-                </div>
-                <div class="info-item none-info" id="socket">
-                    <b>Сокет: </b>${productCompatibility.socket}
-                </div>
-                <div class="info-item none-info" id="ddr">
-                    <b>DDR: </b>${productCompatibility.ddr}
-                </div>
-                <div class="info-item none-info" id="gddr">
-                    <b>GDDR: </b>${productCompatibility.gddr}
-                </div>
-                <div class="info-item none-info" id="format">
-                    <b>Формат: </b>${productCompatibility.format}
-                </div>
-            </div>
-            <!-- Кнопка в корзину -->
-            <form action="/cart/addFromProduct/${product.id}" method="post" style="margin: 12px;">
+            <form action="/cart/addFromProduct/${product.id}" method="post">
                 <input type="hidden" name="_csrf" value="${_csrf.token}">
                 <button type="submit" class="add-to-cart-btn">
-                    🛒 В корзину
+                    <img src="../../static/images/cart.png" />
+                    <span>В корзину</span>
                 </button>
             </form>
 
@@ -59,40 +34,88 @@
                     <input class="delete-btn hover" type="submit" value="Удалить товар"/>
                 </form>
             </#if>
+
+            <div class="product-details-box">
+                <button class="btn btn-details" type="button" style="margin:10px 0;">
+                    <span class="btn-details-name">Характеристики</span>
+                    <img class="btn-details-action" src="../static/images/arrow.svg"/>
+                </button>
+
+                <div class="product-details" style="display:none;">
+                    <div class="info-item info-item-border">
+                        <b class="info-item-name">Производитель</b>${product.manufacturer}
+                    </div>
+                    <div class="info-item info-item-border">
+                        <b class="info-item-name">Описание товара</b>${product.description}
+                    </div>
+                    <div class="info-item none-info info-item-border" id="socket">
+                        <b class="info-item-name">Сокет</b>${productCompatibility.socket}
+                    </div>
+                    <div class="info-item none-info info-item-border" id="ddr">
+                        <b class="info-item-name">DDR</b>${productCompatibility.ddr}
+                    </div>
+                    <div class="info-item none-info info-item-border" id="gddr">
+                        <b class="info-item-name">GDDR</b>${productCompatibility.gddr}
+                    </div>
+                    <div class="info-item none-info info-item-border" id="format">
+                        <b class="info-item-name">Формат</b>${productCompatibility.format}
+                    </div>
+                </div>
+            </div>
+<#--            <div class="product-buttons">-->
+<#--                <form action="/cart/addFromProduct/${product.id}" method="post">-->
+<#--                    <input type="hidden" name="_csrf" value="${_csrf.token}">-->
+<#--                    <button type="submit" class="add-to-cart-btn">-->
+<#--                        <img src="../../static/images/cart.png" />-->
+<#--                        <span>В корзину</span>-->
+<#--                    </button>-->
+<#--                </form>-->
+
+<#--                <#if user.isAdmin()>-->
+<#--                    <form class="delete-product" action="/Product/delete/${product.id}" method="post">-->
+<#--                        <input type="hidden" name="_csrf" value="${_csrf.token}">-->
+<#--                        <input class="delete-btn hover" type="submit" value="Удалить товар"/>-->
+<#--                    </form>-->
+<#--                </#if>-->
+<#--            </div>-->
         </div>
     </div>
     <div class="reviews-section">
-        <h3>Отзывы</h3>
-        <#if user??>
-            <form class="review-form" action="/Product/${product.id}/review"  method="post">
-                <input type="hidden" name="_csrf" value="${_csrf.token}">
-                <label for="rating">Ваша оценка:</label>
-                <div class="stars">
-                    <#list 1..5 as i>
-                        <input type="radio" id="star${i}" name="rating" value="${i}" required>
-                        <label for="star${i}">★</label>
-                    </#list>
-                </div>
-                <textarea name="comment" maxlength="350" required placeholder="Ваш отзыв (до 350 символов)"></textarea>
-                <button type="submit">Оставить отзыв</button>
-            </form>
-        <#else>
-            <div>Для отправки отзыва <a href="/login">войдите</a> на сайт</div>
-        </#if>
-
+        <div class="user-review">
+            <h3 class="reviews-sub">Отзывы</h3>
+            <#if user??>
+                <form class="review-form" action="/Product/${product.id}/review"  method="post">
+                    <input type="hidden" name="_csrf" value="${_csrf.token}">
+                    <div class="set-stars-row">
+                        <label for="rating">Ваша оценка:</label>
+                        <div class="stars">
+                            <#list 5..1 as i>  <!-- меняем порядок -->
+                                <input type="radio" id="star${i}" name="rating" value="${i}" required>
+                                <label for="star${i}">★</label>
+                            </#list>
+                        </div>
+                    </div>
+                    <textarea name="comment" maxlength="350" required placeholder="Ваш отзыв (до 350 символов)"></textarea>
+                    <button type="submit" class="send-btn">Оставить отзыв</button>
+                </form>
+            <#else>
+                <div>Для отправки отзыва <a href="/login">войдите</a> на сайт</div>
+            </#if>
+        </div>
         <div class="reviews-list">
             <#if reviews?size == 0>
                 <div>Нет отзывов</div>
             <#else>
                 <#list reviews as review>
                     <div class="review-block">
-                        <div>
-                            <b>${review.author.name}</b> —
+                        <div class="review-author">
+                            <div class="review-author-avatar">${review.author.name[0]?upper_case}</div>
+                            <b>${review.author.name}</b>
                             <span>
                                 <#list 1..review.rating as _>★</#list>
                             </span>
-                            <p>Создан: ${review.getFormattedCreatedDate()}</p>
                         </div>
+                        <p class="review-date">${review.getFormattedCreatedDate()}</p>
                         <div>${review.comment}</div>
                     </div>
                 </#list>
@@ -136,29 +159,32 @@
             images[i].classList.add("None");
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        // document.addEventListener('DOMContentLoaded', function() {
             const left = document.querySelector(".info-arr-left");
             const right = document.querySelector(".info-arr-right");
-            const button = document.querySelector(".buy-btn");
+            // const button = document.querySelector(".buy-btn");
             const detailsBtn = document.querySelector(".btn-details");
             const detailsBox = document.querySelector(".product-details");
+            const detailsArrow = document.querySelector(".btn-details-action")
 
             left.addEventListener("click", () => { sliderLeft(); })
             right.addEventListener("click", () => { sliderRight(); })
 
-            button.addEventListener("click", () => {
-                const messageText = "Здравствуйте! Я хочу приобрести товар ${product.title}%0AАртикул: ${product.id}";
-                window.open("https://t.me/hxxdrichXD?text=" + messageText);
-            })
+            <#--button.addEventListener("click", () => {-->
+            <#--    const messageText = "Здравствуйте! Я хочу приобрести товар ${product.title}%0AАртикул: ${product.id}";-->
+            <#--    window.open("https://t.me/hxxdrichXD?text=" + messageText);-->
+            <#--})-->
 
             // Показать/скрыть характеристики
             detailsBtn.addEventListener("click", function() {
                 if (detailsBox.style.display === "none" || detailsBox.style.display === "") {
                     detailsBox.style.display = "block";
-                    detailsBtn.textContent = "Скрыть";
+                    // detailsBtn.textContent = "Скрыть";
+                    detailsArrow.setAttribute('style', "transform: rotate(270deg);")
                 } else {
                     detailsBox.style.display = "none";
-                    detailsBtn.textContent = "Подробнее";
+                    // detailsBtn.textContent = "Подробнее";
+                    detailsArrow.setAttribute('style', "transform: rotate(90deg);")
                 }
             });
 
@@ -184,21 +210,6 @@
                     document.getElementById("format").classList.remove("none-info");
                     break;
             }
-
-            document.querySelectorAll('.btn-details').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    console.log('Клик по кнопке "Подробнее"');
-                    // Найти .product-details рядом с кнопкой
-                    const detailsBox = this.parentNode.querySelector('.product-details');
-                    if (detailsBox.style.display === "none" || detailsBox.style.display === "") {
-                        detailsBox.style.display = "block";
-                        btn.textContent = "Скрыть";
-                    } else {
-                        detailsBox.style.display = "none";
-                        btn.textContent = "Подробнее";
-                    }
-                });
-            });
-        });
+        // });
     </script>
 </@t.template>
