@@ -24,11 +24,10 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("Корзина пуста.");
         }
 
-        // Создаём заказ
         Order order = new Order();
         order.setUser(cart.getUser());
         order.setDate(LocalDateTime.now());
-        order.setStatus(OrderStatus.CREATED); // или другой статус по-умолчанию
+        order.setStatus(OrderStatus.CREATED);
         order.setTotalPrice(cart.getItems().stream()
                 .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
                 .sum());
@@ -36,8 +35,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCustomerPhone(phone);
         order.setAddress(address);
         order.setPostalCode(postalCode);
-
-        // Копируем товары из корзины в заказ
+        
         List<OrderItem> orderItems = cart.getItems().stream().map(cartItem -> {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
@@ -48,10 +46,8 @@ public class OrderServiceImpl implements OrderService {
         }).collect(Collectors.toList());
         order.setItems(orderItems);
 
-        // Сохраняем заказ
         orderRepository.save(order);
 
-        // Очищаем корзину пользователя
         cart.getItems().clear();
         cartRepository.save(cart);
     }
