@@ -121,11 +121,10 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> getProductsSortedByRating() {
         List<Product> products = productRepository.findAll();
 
-        // сортируем по среднему рейтингу
         products.sort((p1, p2) -> {
             double r1 = getAverageRating(p1.getId());
             double r2 = getAverageRating(p2.getId());
-            return Double.compare(r2, r1); // по убыванию
+            return Double.compare(r2, r1); 
         });
 
         return products;
